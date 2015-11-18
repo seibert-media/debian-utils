@@ -8,9 +8,9 @@ import (
 )
 
 func TestImplementsImageSaver(t *testing.T) {
-	c := New()
-	var i *Creator
-	err := AssertThat(c, Implements(i).Message("check type"))
+	b := New()
+	var i *Builder
+	err := AssertThat(b, Implements(i).Message("check type"))
 	if err != nil {
 		t.Fatal(err)
 	}
