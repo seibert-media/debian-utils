@@ -1,17 +1,17 @@
-aptly
+debian
 ======
 
-Package provide some aptly utils
+Package provide some debian utils
 
 Documentation
 -------------
 
-http://godoc.org/github.com/bborbe/aptly
+http://godoc.org/github.com/bborbe/debian
 
 Continuous integration
 ----------------------
 
-http://jenkins.benjamin-borbe.de/job/Go-Aptly/
+http://jenkins.benjamin-borbe.de/job/Go-Debian/
 
 Copyright and license
 ---------------------
