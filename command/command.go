@@ -11,7 +11,7 @@ type command struct {
 }
 
 func New(do func() error, undo func() error) *command {
-	c := new (command)
+	c := new(command)
 	c.do = do
 	c.undo = undo
 	return c

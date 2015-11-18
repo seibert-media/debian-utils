@@ -1,6 +1,5 @@
 package package_creator
 
-
 import (
 	"testing"
 
@@ -8,7 +7,7 @@ import (
 )
 
 func TestImplementsImageSaver(t *testing.T) {
-	b := New()
+	b := New(nil)
 	var i *Builder
 	err := AssertThat(b, Implements(i).Message("check type"))
 	if err != nil {
