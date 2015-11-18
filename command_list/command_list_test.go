@@ -86,7 +86,7 @@ func TestRunSecondFail(t *testing.T) {
 	if err := AssertThat(list.Run(), NotNilValue()); err != nil {
 		t.Fatal(err)
 	}
-	if err := AssertThat(doCounter, Is(2)); err != nil {
+	if err := AssertThat(doCounter, Is(3)); err != nil {
 		t.Fatal(err)
 	}
 	if err := AssertThat(undoCounter, Is(2)); err != nil {
