@@ -4,9 +4,9 @@ import (
 	"testing"
 
 	. "github.com/bborbe/assert"
-	io_mock "github.com/bborbe/io/mock"
-	"github.com/bborbe/debian/package_builder"
 	"github.com/bborbe/debian/command_list"
+	"github.com/bborbe/debian/package_builder"
+	io_mock "github.com/bborbe/io/mock"
 )
 
 func TestDo(t *testing.T) {

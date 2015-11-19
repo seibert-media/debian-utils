@@ -8,17 +8,23 @@ import (
 	"fmt"
 	"strings"
 
+	"bytes"
+	"os/exec"
+
 	"github.com/bborbe/debian/command"
 	"github.com/bborbe/debian/command_list"
 	"github.com/bborbe/log"
-	"bytes"
-	"os/exec"
 )
 
 type Builder interface {
 	Build() error
 	Name(name string) error
 	Version(version string) error
+	Section(section string) error
+	Priority(priority string) error
+	Architecture(architecture string) error
+	Maintainer(maintainer string) error
+	Description(description string) error
 	AddFile(source string, target string) error
 }
 
@@ -47,6 +53,51 @@ func New(commandList command_list.CommandList) *builder {
 	b.description = "-"
 	b.files = map[string]string{}
 	return b
+}
+
+func (b *builder) Section(section string) error {
+	logger.Debugf("Section %s", section)
+	if len(section) == 0 {
+		return fmt.Errorf("section empty")
+	}
+	b.section = section
+	return nil
+}
+
+func (b *builder) Priority(priority string) error {
+	logger.Debugf("Priority %s", priority)
+	if len(priority) == 0 {
+		return fmt.Errorf("priority empty")
+	}
+	b.priority = priority
+	return nil
+}
+
+func (b *builder) Architecture(architecture string) error {
+	logger.Debugf("Architecture %s", architecture)
+	if len(architecture) == 0 {
+		return fmt.Errorf("architecture empty")
+	}
+	b.architecture = architecture
+	return nil
+}
+
+func (b *builder) Maintainer(maintainer string) error {
+	logger.Debugf("Maintainer %s", maintainer)
+	if len(maintainer) == 0 {
+		return fmt.Errorf("maintainer empty")
+	}
+	b.maintainer = maintainer
+	return nil
+}
+
+func (b *builder) Description(description string) error {
+	logger.Debugf("Description %s", description)
+	if len(description) == 0 {
+		return fmt.Errorf("description empty")
+	}
+	b.description = description
+	return nil
 }
 
 func (b *builder) Name(name string) error {
@@ -244,7 +295,7 @@ func createDirectory(directory string) error {
 func dirOf(filename string) (string, error) {
 	pos := strings.LastIndex(filename, "/")
 	if pos != -1 {
-		return filename[:pos + 1], nil
+		return filename[:pos+1], nil
 	}
 	return "", fmt.Errorf("can't determine directory of file %s", filename)
 }
@@ -261,7 +312,7 @@ func copy(dst, src string) error {
 	}
 	defer in.Close()
 
-	out, err := os.OpenFile(dst, os.O_RDWR | os.O_CREATE | os.O_TRUNC, finfo.Mode())
+	out, err := os.OpenFile(dst, os.O_RDWR|os.O_CREATE|os.O_TRUNC, finfo.Mode())
 	if err != nil {
 		return err
 	}

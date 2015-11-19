@@ -8,18 +8,18 @@ import (
 
 	"io"
 
-	"github.com/bborbe/log"
-	"github.com/bborbe/debian/package_builder"
 	"github.com/bborbe/debian/command_list"
+	"github.com/bborbe/debian/package_builder"
+	"github.com/bborbe/log"
 )
 
 var logger = log.DefaultLogger
 
 const (
-	PARAMETER_NAME = "name"
-	PARAMETER_VERSION = "version"
-	PARAMETER_SOURCE = "source"
-	PARAMETER_TARGET = "target"
+	PARAMETER_NAME     = "name"
+	PARAMETER_VERSION  = "version"
+	PARAMETER_SOURCE   = "source"
+	PARAMETER_TARGET   = "target"
 	PARAMETER_LOGLEVEL = "loglevel"
 )
 
