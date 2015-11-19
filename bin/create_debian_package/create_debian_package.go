@@ -2,14 +2,13 @@ package main
 
 import (
 	"flag"
+	"io"
 	"os"
-
 	"runtime"
 
-	"io"
-
-	"github.com/bborbe/debian/command_list"
-	"github.com/bborbe/debian/package_builder"
+	debian_command_list "github.com/bborbe/debian/command_list"
+	debian_config_builder "github.com/bborbe/debian/config_builder"
+	debian_package_creator "github.com/bborbe/debian/package_creator"
 	"github.com/bborbe/log"
 )
 
@@ -36,10 +35,13 @@ func main() {
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	builder := package_creator.New(command_list.New())
+	config_builder := debian_config_builder.New()
+	package_creator := debian_package_creator.New(func() debian_command_list.CommandList {
+		return debian_command_list.New()
+	})
 
 	writer := os.Stdout
-	err := do(writer, builder, *namePtr, *versionPtr, *sourcePtr, *targetPtr)
+	err := do(writer, config_builder, package_creator, *namePtr, *versionPtr, *sourcePtr, *targetPtr)
 	if err != nil {
 		logger.Fatal(err)
 		logger.Close()
@@ -47,16 +49,17 @@ func main() {
 	}
 }
 
-func do(writer io.Writer, builder package_creator.Builder, name string, version string, source string, target string) error {
+func do(writer io.Writer, config_builder debian_config_builder.ConfigBuilder, package_creator debian_package_creator.PackageCreator, name string, version string, source string, target string) error {
 	logger.Debugf("create deb %s_%s.deb", name, version)
-	if err := builder.AddFile(source, target); err != nil {
+	var err error
+	if err = config_builder.AddFile(source, target); err != nil {
 		return err
 	}
-	if err := builder.Name(name); err != nil {
+	if err = config_builder.Name(name); err != nil {
 		return err
 	}
-	if err := builder.Version(version); err != nil {
+	if err = config_builder.Version(version); err != nil {
 		return err
 	}
-	return builder.Build()
+	return package_creator.CreatePackage(config_builder.Build())
 }

@@ -1,4 +1,4 @@
-package package_creator
+package config_builder
 
 import (
 	"testing"
@@ -6,9 +6,9 @@ import (
 	. "github.com/bborbe/assert"
 )
 
-func TestImplementsImageSaver(t *testing.T) {
-	b := New(nil)
-	var i *Builder
+func TestImplementsConfigBuilder(t *testing.T) {
+	b := New()
+	var i *ConfigBuilder
 	err := AssertThat(b, Implements(i).Message("check type"))
 	if err != nil {
 		t.Fatal(err)
