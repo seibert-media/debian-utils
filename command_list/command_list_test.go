@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	. "github.com/bborbe/assert"
-	"github.com/bborbe/debian/command"
+	"github.com/bborbe/debian-utils/command"
 )
 
 func TestImplementsCommandList(t *testing.T) {

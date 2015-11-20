@@ -8,10 +8,10 @@ import (
 	"os/exec"
 	"strings"
 
-	debian_command "github.com/bborbe/debian/command"
-	debian_command_list "github.com/bborbe/debian/command_list"
-	debian_config "github.com/bborbe/debian/config"
-	debian_copier "github.com/bborbe/debian/copier"
+	debian_command "github.com/bborbe/debian-utils/command"
+	debian_command_list "github.com/bborbe/debian-utils/command_list"
+	debian_config "github.com/bborbe/debian-utils/config"
+	debian_copier "github.com/bborbe/debian-utils/copier"
 	"github.com/bborbe/log"
 )
 

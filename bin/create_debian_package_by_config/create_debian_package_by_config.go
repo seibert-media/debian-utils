@@ -8,11 +8,11 @@ import (
 	"os"
 	"runtime"
 
-	debian_command_list "github.com/bborbe/debian/command_list"
-	debian_config "github.com/bborbe/debian/config"
-	debian_config_parser "github.com/bborbe/debian/config_parser"
-	debian_copier "github.com/bborbe/debian/copier"
-	debian_package_creator "github.com/bborbe/debian/package_creator"
+	debian_command_list "github.com/bborbe/debian-utils/command_list"
+	debian_config "github.com/bborbe/debian-utils/config"
+	debian_config_parser "github.com/bborbe/debian-utils/config_parser"
+	debian_copier "github.com/bborbe/debian-utils/copier"
+	debian_package_creator "github.com/bborbe/debian-utils/package_creator"
 	"github.com/bborbe/log"
 )
 

@@ -3,7 +3,7 @@ package config_builder
 import (
 	"fmt"
 
-	debian_config "github.com/bborbe/debian/config"
+	debian_config "github.com/bborbe/debian-utils/config"
 	"github.com/bborbe/log"
 )
 

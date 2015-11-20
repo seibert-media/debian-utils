@@ -4,9 +4,9 @@ import (
 	"testing"
 
 	. "github.com/bborbe/assert"
-	debian_command_list "github.com/bborbe/debian/command_list"
-	debian_config_builder "github.com/bborbe/debian/config_builder"
-	debian_package_creator "github.com/bborbe/debian/package_creator"
+	debian_command_list "github.com/bborbe/debian-utils/command_list"
+	debian_config_builder "github.com/bborbe/debian-utils/config_builder"
+	debian_package_creator "github.com/bborbe/debian-utils/package_creator"
 	io_mock "github.com/bborbe/io/mock"
 )
 
