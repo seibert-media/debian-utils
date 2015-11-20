@@ -1,9 +1,11 @@
 package copier
+
 import (
-	"os"
-	"io"
-	"github.com/bborbe/log"
 	"fmt"
+	"io"
+	"os"
+
+	"github.com/bborbe/log"
 )
 
 type Copier interface {
@@ -11,7 +13,6 @@ type Copier interface {
 }
 
 type copier struct {
-
 }
 
 var logger = log.DefaultLogger
@@ -72,7 +73,7 @@ func (c *copier) CopyFile(source string, target string) error {
 	}
 	defer in.Close()
 
-	out, err := os.OpenFile(target, os.O_RDWR | os.O_CREATE | os.O_TRUNC, finfo.Mode())
+	out, err := os.OpenFile(target, os.O_RDWR|os.O_CREATE|os.O_TRUNC, finfo.Mode())
 	if err != nil {
 		return err
 	}

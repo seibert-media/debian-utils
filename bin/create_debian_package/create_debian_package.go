@@ -5,20 +5,21 @@ import (
 	"io"
 	"os"
 	"runtime"
-	"github.com/bborbe/log"
+
 	debian_command_list "github.com/bborbe/debian/command_list"
 	debian_config_builder "github.com/bborbe/debian/config_builder"
-	debian_package_creator "github.com/bborbe/debian/package_creator"
 	debian_copier "github.com/bborbe/debian/copier"
+	debian_package_creator "github.com/bborbe/debian/package_creator"
+	"github.com/bborbe/log"
 )
 
 var logger = log.DefaultLogger
 
 const (
-	PARAMETER_NAME = "name"
-	PARAMETER_VERSION = "version"
-	PARAMETER_SOURCE = "source"
-	PARAMETER_TARGET = "target"
+	PARAMETER_NAME     = "name"
+	PARAMETER_VERSION  = "version"
+	PARAMETER_SOURCE   = "source"
+	PARAMETER_TARGET   = "target"
 	PARAMETER_LOGLEVEL = "loglevel"
 )
 

@@ -8,11 +8,11 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/bborbe/log"
 	debian_command "github.com/bborbe/debian/command"
 	debian_command_list "github.com/bborbe/debian/command_list"
 	debian_config "github.com/bborbe/debian/config"
 	debian_copier "github.com/bborbe/debian/copier"
+	"github.com/bborbe/log"
 )
 
 type PackageCreator interface {
@@ -214,8 +214,7 @@ func createDirectory(directory string) error {
 func dirOf(filename string) (string, error) {
 	pos := strings.LastIndex(filename, "/")
 	if pos != -1 {
-		return filename[:pos + 1], nil
+		return filename[:pos+1], nil
 	}
 	return "", fmt.Errorf("can't determine directory of file %s", filename)
 }
-

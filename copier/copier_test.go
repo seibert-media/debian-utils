@@ -1,6 +1,5 @@
 package copier
 
-
 import (
 	"testing"
 
