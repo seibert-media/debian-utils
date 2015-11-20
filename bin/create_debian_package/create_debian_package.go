@@ -5,20 +5,20 @@ import (
 	"io"
 	"os"
 	"runtime"
-
+	"github.com/bborbe/log"
 	debian_command_list "github.com/bborbe/debian/command_list"
 	debian_config_builder "github.com/bborbe/debian/config_builder"
 	debian_package_creator "github.com/bborbe/debian/package_creator"
-	"github.com/bborbe/log"
+	debian_copier "github.com/bborbe/debian/copier"
 )
 
 var logger = log.DefaultLogger
 
 const (
-	PARAMETER_NAME     = "name"
-	PARAMETER_VERSION  = "version"
-	PARAMETER_SOURCE   = "source"
-	PARAMETER_TARGET   = "target"
+	PARAMETER_NAME = "name"
+	PARAMETER_VERSION = "version"
+	PARAMETER_SOURCE = "source"
+	PARAMETER_TARGET = "target"
 	PARAMETER_LOGLEVEL = "loglevel"
 )
 
@@ -35,10 +35,11 @@ func main() {
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
+	copier := debian_copier.New()
 	config_builder := debian_config_builder.New()
 	package_creator := debian_package_creator.New(func() debian_command_list.CommandList {
 		return debian_command_list.New()
-	})
+	}, copier)
 
 	writer := os.Stdout
 	err := do(writer, config_builder, package_creator, *namePtr, *versionPtr, *sourcePtr, *targetPtr)

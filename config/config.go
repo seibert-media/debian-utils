@@ -14,6 +14,7 @@ type Config struct {
 	Architecture string `json:"architecture"`
 	Maintainer   string `json:"maintainer"`
 	Description  string `json:"description"`
+	Homepage     string `json:"homepage"`
 }
 
 func DefaultConfig() *Config {

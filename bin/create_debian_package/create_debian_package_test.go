@@ -16,7 +16,7 @@ func TestDo(t *testing.T) {
 	config_builder := debian_config_builder.New()
 	package_creator := debian_package_creator.New(func() debian_command_list.CommandList {
 		return debian_command_list.New()
-	})
+	}, nil)
 
 	err = do(writer, config_builder, package_creator, "", "", "", "")
 	err = AssertThat(err, NotNilValue())

@@ -3,29 +3,31 @@ package package_creator
 import (
 	"bytes"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"strings"
 
+	"github.com/bborbe/log"
 	debian_command "github.com/bborbe/debian/command"
 	debian_command_list "github.com/bborbe/debian/command_list"
-	"github.com/bborbe/debian/config"
-	"github.com/bborbe/log"
+	debian_config "github.com/bborbe/debian/config"
+	debian_copier "github.com/bborbe/debian/copier"
 )
 
 type PackageCreator interface {
-	CreatePackage(config *config.Config) error
+	CreatePackage(config *debian_config.Config) error
 }
 
 type packageCreator struct {
 	commandListProvider CommandListProvider
+	copier              debian_copier.Copier
 }
 
 type builder struct {
-	config           *config.Config
+	config           *debian_config.Config
 	command_list     debian_command_list.CommandList
+	copier           debian_copier.Copier
 	workingdirectory string
 }
 
@@ -33,15 +35,17 @@ var logger = log.DefaultLogger
 
 type CommandListProvider func() debian_command_list.CommandList
 
-func New(commandListProvider CommandListProvider) *packageCreator {
+func New(commandListProvider CommandListProvider, copier debian_copier.Copier) *packageCreator {
 	p := new(packageCreator)
 	p.commandListProvider = commandListProvider
+	p.copier = copier
 	return p
 }
 
-func (p *packageCreator) CreatePackage(config *config.Config) error {
+func (p *packageCreator) CreatePackage(config *debian_config.Config) error {
 	b := new(builder)
 	b.command_list = p.commandListProvider()
+	b.copier = p.copier
 	b.config = config
 	logger.Debug("Build")
 	b.command_list.Add(b.validateCommand())
@@ -152,7 +156,9 @@ func (b *builder) copyDebianPackageCommand() debian_command.Command {
 		if dir, err = os.Getwd(); err != nil {
 			return err
 		}
-		if err = copy(fmt.Sprintf("%s/%s_%s.deb", dir, b.config.Name, b.config.Version), fmt.Sprintf("%s/%s_%s.deb", b.workingdirectory, b.config.Name, b.config.Version)); err != nil {
+		source := fmt.Sprintf("%s/%s_%s.deb", b.workingdirectory, b.config.Name, b.config.Version)
+		target := fmt.Sprintf("%s/%s_%s.deb", dir, b.config.Name, b.config.Version)
+		if err = b.copier.Copy(source, target); err != nil {
 			return err
 		}
 		logger.Debugf("debian package copied")
@@ -176,7 +182,7 @@ func (b *builder) copyFilesToWorkingDirectoryCommand() debian_command.Command {
 			if err = createDirectory(directory); err != nil {
 				return err
 			}
-			if err = copy(filename, file.Source); err != nil {
+			if err = b.copier.Copy(file.Source, filename); err != nil {
 				return err
 			}
 		}
@@ -208,32 +214,8 @@ func createDirectory(directory string) error {
 func dirOf(filename string) (string, error) {
 	pos := strings.LastIndex(filename, "/")
 	if pos != -1 {
-		return filename[:pos+1], nil
+		return filename[:pos + 1], nil
 	}
 	return "", fmt.Errorf("can't determine directory of file %s", filename)
 }
 
-func copy(dst, src string) error {
-	finfo, err := os.Stat(src)
-	if err != nil {
-		return err
-	}
-
-	in, err := os.Open(src)
-	if err != nil {
-		return err
-	}
-	defer in.Close()
-
-	out, err := os.OpenFile(dst, os.O_RDWR|os.O_CREATE|os.O_TRUNC, finfo.Mode())
-	if err != nil {
-		return err
-	}
-	defer out.Close()
-
-	_, err = io.Copy(out, in)
-	if err != nil {
-		return err
-	}
-	return nil
-}

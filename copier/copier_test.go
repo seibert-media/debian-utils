@@ -1,4 +1,5 @@
-package package_creator
+package copier
+
 
 import (
 	"testing"
@@ -6,9 +7,9 @@ import (
 	. "github.com/bborbe/assert"
 )
 
-func TestImplementsPackageCreator(t *testing.T) {
-	b := New(nil, nil)
-	var i *PackageCreator
+func TestImplementsCopier(t *testing.T) {
+	b := New()
+	var i *Copier
 	err := AssertThat(b, Implements(i).Message("check type"))
 	if err != nil {
 		t.Fatal(err)

@@ -10,7 +10,7 @@ import (
 func TestDo(t *testing.T) {
 	var err error
 	writer := io_mock.NewWriter()
-	err = do(writer, nil, nil, "")
+	err = do(writer, nil, nil, "", "")
 	err = AssertThat(err, NotNilValue())
 	if err != nil {
 		t.Fatal(err)

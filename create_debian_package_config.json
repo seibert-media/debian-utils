@@ -1,6 +1,10 @@
 {
   "name": "debian",
-  "version": "1.0.0",
+  "section": "utils",
+  "priority": "optional",
+  "architecture": "amd64",
+  "maintainer": "Benjamin Borbe <bborbe@rocketnews.de>",
+  "description": "Debian Package Utils",
   "files": [
     {
       "source": "bin/create_debian_package",
