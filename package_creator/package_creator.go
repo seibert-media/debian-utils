@@ -128,6 +128,9 @@ func (b *builder) controlContent() []byte {
 	fmt.Fprintf(buffer, "Architecture: %s\n", b.config.Architecture)
 	fmt.Fprintf(buffer, "Maintainer: %s\n", b.config.Maintainer)
 	fmt.Fprintf(buffer, "Description: %s\n", b.config.Description)
+	if len(b.config.Depends) > 0 {
+		fmt.Fprintf(buffer, "Depends: %s\n", strings.Join(b.config.Depends, ","))
+	}
 	return buffer.Bytes()
 }
 

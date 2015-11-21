@@ -16,6 +16,7 @@ type ConfigBuilder interface {
 	Maintainer(maintainer string) error
 	Description(description string) error
 	AddFile(source string, target string) error
+	AddDepend(depend string) error
 	Build() *debian_config.Config
 }
 
@@ -91,6 +92,14 @@ func (c *configBuilder) Version(version string) error {
 		return fmt.Errorf("version empty")
 	}
 	c.config.Version = version
+	return nil
+}
+
+func (c *configBuilder) AddDepend(depend string) error {
+	if len(depend) == 0 {
+		return fmt.Errorf("depend empty")
+	}
+	c.config.Depends = append(c.config.Depends, depend)
 	return nil
 }
 

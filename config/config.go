@@ -6,15 +6,16 @@ type File struct {
 }
 
 type Config struct {
-	Name         string `json:"name"`
-	Version      string `json:"version"`
-	Files        []File `json:"files"`
-	Section      string `json:"section"`
-	Priority     string `json:"priority"`
-	Architecture string `json:"architecture"`
-	Maintainer   string `json:"maintainer"`
-	Description  string `json:"description"`
-	Homepage     string `json:"homepage"`
+	Name         string   `json:"name"`
+	Version      string   `json:"version"`
+	Files        []File   `json:"files"`
+	Section      string   `json:"section"`
+	Priority     string   `json:"priority"`
+	Architecture string   `json:"architecture"`
+	Maintainer   string   `json:"maintainer"`
+	Description  string   `json:"description"`
+	Homepage     string   `json:"homepage"`
+	Depends      []string `json:"depends"`
 }
 
 func DefaultConfig() *Config {
@@ -25,5 +26,6 @@ func DefaultConfig() *Config {
 	c.Maintainer = "Benjamin Borbe <bborbe@rocketnews.de>"
 	c.Description = "-"
 	c.Files = []File{}
+	c.Depends = []string{}
 	return c
 }
