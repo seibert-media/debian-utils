@@ -52,6 +52,7 @@ func (p *packageCreator) CreatePackage(config *debian_config.Config) error {
 	b.command_list.Add(b.createWorkingDirectoryCommand())
 	b.command_list.Add(b.createDebianFolderCommand())
 	b.command_list.Add(b.createDebianControlCommand())
+	b.command_list.Add(b.createDebianConffilesCommand())
 	b.command_list.Add(b.copyFilesToWorkingDirectoryCommand())
 	b.command_list.Add(b.createDebianPackageCommand())
 	b.command_list.Add(b.copyDebianPackageCommand())
@@ -109,7 +110,7 @@ func (b *builder) createDebianFolderCommand() debian_command.Command {
 func (b *builder) createDebianControlCommand() debian_command.Command {
 	return debian_command.New(func() error {
 		logger.Debugf("write debian control")
-		if err := ioutil.WriteFile(fmt.Sprintf("%s/%s_%s/DEBIAN/control", b.workingdirectory, b.config.Name, b.config.Version), b.controlContent(), 0644); err != nil {
+		if err := ioutil.WriteFile(fmt.Sprintf("%s/%s_%s/DEBIAN/control", b.workingdirectory, b.config.Name, b.config.Version), controlContent(*b.config), 0644); err != nil {
 			return err
 		}
 		logger.Debugf("debian control written")
@@ -119,17 +120,45 @@ func (b *builder) createDebianControlCommand() debian_command.Command {
 	})
 }
 
-func (b *builder) controlContent() []byte {
+func controlContent(config debian_config.Config) []byte {
 	buffer := bytes.NewBufferString("")
-	fmt.Fprintf(buffer, "Package: %s\n", b.config.Name)
-	fmt.Fprintf(buffer, "Version: %s\n", b.config.Version)
-	fmt.Fprintf(buffer, "Section: %s\n", b.config.Section)
-	fmt.Fprintf(buffer, "Priority: %s\n", b.config.Priority)
-	fmt.Fprintf(buffer, "Architecture: %s\n", b.config.Architecture)
-	fmt.Fprintf(buffer, "Maintainer: %s\n", b.config.Maintainer)
-	fmt.Fprintf(buffer, "Description: %s\n", b.config.Description)
-	if len(b.config.Depends) > 0 {
-		fmt.Fprintf(buffer, "Depends: %s\n", strings.Join(b.config.Depends, ","))
+	fmt.Fprintf(buffer, "Package: %s\n", config.Name)
+	fmt.Fprintf(buffer, "Version: %s\n", config.Version)
+	fmt.Fprintf(buffer, "Section: %s\n", config.Section)
+	fmt.Fprintf(buffer, "Priority: %s\n", config.Priority)
+	fmt.Fprintf(buffer, "Architecture: %s\n", config.Architecture)
+	fmt.Fprintf(buffer, "Maintainer: %s\n", config.Maintainer)
+	fmt.Fprintf(buffer, "Description: %s\n", config.Description)
+	if len(config.Depends) > 0 {
+		fmt.Fprintf(buffer, "Depends: %s\n", strings.Join(config.Depends, ","))
+	}
+	return buffer.Bytes()
+}
+
+func (b *builder) createDebianConffilesCommand() debian_command.Command {
+	return debian_command.New(func() error {
+		logger.Debugf("write debian conffiles")
+		content := conffilesContent(b.config.Files)
+		if len(content) > 0 {
+			if err := ioutil.WriteFile(fmt.Sprintf("%s/%s_%s/DEBIAN/conffiles", b.workingdirectory, b.config.Name, b.config.Version), content, 0644); err != nil {
+				return err
+			}
+			logger.Debugf("debian conffiles written")
+		} else {
+			logger.Debugf("no found files, skip writing")
+		}
+		return nil
+	}, func() error {
+		return nil
+	})
+}
+
+func conffilesContent(files []debian_config.File) []byte {
+	buffer := bytes.NewBufferString("")
+	for _, file := range files {
+		if strings.Index(file.Target, "/etc") == 0 {
+			fmt.Fprintf(buffer, "%s\n", file.Target)
+		}
 	}
 	return buffer.Bytes()
 }
@@ -217,7 +246,7 @@ func createDirectory(directory string) error {
 func dirOf(filename string) (string, error) {
 	pos := strings.LastIndex(filename, "/")
 	if pos != -1 {
-		return filename[:pos+1], nil
+		return filename[:pos + 1], nil
 	}
 	return "", fmt.Errorf("can't determine directory of file %s", filename)
 }
