@@ -47,7 +47,7 @@ func (p *packageCreator) CreatePackage(config *debian_config.Config) error {
 	b.command_list = p.commandListProvider()
 	b.copier = p.copier
 	b.config = config
-	logger.Debug("Build")
+	logger.Debug("CreatePackage")
 	b.command_list.Add(b.validateCommand())
 	b.command_list.Add(b.createWorkingDirectoryCommand())
 	b.command_list.Add(b.createDebianFolderCommand())
