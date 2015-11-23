@@ -53,6 +53,7 @@ func (p *packageCreator) CreatePackage(config *debian_config.Config) error {
 	b.command_list.Add(b.createDebianFolderCommand())
 	b.command_list.Add(b.createDebianControlCommand())
 	b.command_list.Add(b.createDebianConffilesCommand())
+	b.command_list.Add(b.createDebianCopyPrePostFilesCommand())
 	b.command_list.Add(b.copyFilesToWorkingDirectoryCommand())
 	b.command_list.Add(b.createDebianPackageCommand())
 	b.command_list.Add(b.copyDebianPackageCommand())
@@ -90,6 +91,38 @@ func (b *builder) createWorkingDirectoryCommand() debian_command.Command {
 		return nil
 	}, func() error {
 		return os.RemoveAll(b.workingdirectory)
+	})
+}
+
+func (b *builder) createDebianCopyPrePostFilesCommand() debian_command.Command {
+	return debian_command.New(func() error {
+		logger.Debugf("copy pre post inst rm files")
+		var err error
+		path := fmt.Sprintf("%s/%s_%s/DEBIAN", b.workingdirectory, b.config.Name, b.config.Version)
+		if len(b.config.Postinst) > 0 {
+			if err = b.copier.Copy(b.config.Postinst, fmt.Sprintf("%s/postinst", path)); err != nil {
+				return err
+			}
+		}
+		if len(b.config.Postrm) > 0 {
+			if err = b.copier.Copy(b.config.Postrm, fmt.Sprintf("%s/postrm", path)); err != nil {
+				return err
+			}
+		}
+		if len(b.config.Preinst) > 0 {
+			if err = b.copier.Copy(b.config.Preinst, fmt.Sprintf("%s/preinst", path)); err != nil {
+				return err
+			}
+		}
+		if len(b.config.Prerm) > 0 {
+			if err = b.copier.Copy(b.config.Prerm, fmt.Sprintf("%s/prerm", path)); err != nil {
+				return err
+			}
+		}
+		logger.Debugf("pre post inst rm files copied")
+		return nil
+	}, func() error {
+		return nil
 	})
 }
 
@@ -246,7 +279,7 @@ func createDirectory(directory string) error {
 func dirOf(filename string) (string, error) {
 	pos := strings.LastIndex(filename, "/")
 	if pos != -1 {
-		return filename[:pos + 1], nil
+		return filename[:pos+1], nil
 	}
 	return "", fmt.Errorf("can't determine directory of file %s", filename)
 }

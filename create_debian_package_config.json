@@ -5,6 +5,10 @@
   "architecture": "amd64",
   "maintainer": "Benjamin Borbe <bborbe@rocketnews.de>",
   "description": "Debian Package Utils",
+  "postrm": "src/github.com/bborbe/debian-utils/files/postrm",
+  "postinst": "src/github.com/bborbe/debian-utils/files/postinst",
+  "prerm": "src/github.com/bborbe/debian-utils/files/prerm",
+  "preinst": "src/github.com/bborbe/debian-utils/files/preinst",
   "files": [
     {
       "source": "bin/create_debian_package",

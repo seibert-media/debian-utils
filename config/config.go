@@ -16,6 +16,10 @@ type Config struct {
 	Description  string   `json:"description"`
 	Homepage     string   `json:"homepage"`
 	Depends      []string `json:"depends"`
+	Postrm       string   `json:"postrm"`
+	Postinst     string   `json:"postinst"`
+	Prerm        string   `json:"prerm"`
+	Preinst      string   `json:"preinst"`
 }
 
 func DefaultConfig() *Config {
