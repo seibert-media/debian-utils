@@ -59,6 +59,27 @@ func TestParseLineWithArch(t *testing.T) {
 	}
 }
 
+func TestParseLineWithAmd64(t *testing.T) {
+	var err error
+	var infos *infos
+	infos, err = ParseLine("deb [arch=amd64] http://aptly.benjamin-borbe.de/stable  default main\n")
+	if err = AssertThat(err, NilValue()); err != nil {
+		t.Fatal(err)
+	}
+	if err = AssertThat(infos.url, Is("http://aptly.benjamin-borbe.de/stable")); err != nil {
+		t.Fatal(err)
+	}
+	if err = AssertThat(infos.distribution, Is("default")); err != nil {
+		t.Fatal(err)
+	}
+	if err = AssertThat(infos.component, Is("main")); err != nil {
+		t.Fatal(err)
+	}
+	if err = AssertThat(infos.architecture, Is("amd64")); err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestRemotePackagesUrl(t *testing.T) {
 	infos := &infos{
 		url:          "http://www.example.com/repo",

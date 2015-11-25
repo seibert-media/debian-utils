@@ -121,7 +121,7 @@ func (a *aptSourceListUpdater) readFile(path string) (string, error) {
 func ParseLine(line string) (*infos, error) {
 	i := new(infos)
 	{
-		re := regexp.MustCompile(`deb\s+\[arch=(.*?)\]\s+([^\s]+)\s([^\s]+)\s+([^\s\n]+)`)
+		re := regexp.MustCompile(`deb\s+\[arch=(.*?)\]\s+([^\s]+)\s+([^\s]+)\s+([^\s]+)`)
 		matches := re.FindStringSubmatch(line)
 		if len(matches) > 1 {
 			i.architecture = matches[1]
@@ -132,7 +132,7 @@ func ParseLine(line string) (*infos, error) {
 		}
 	}
 	{
-		re := regexp.MustCompile(`deb\s+([^\s]+)\s([^\s]+)\s+([^\s\n]+)`)
+		re := regexp.MustCompile(`deb\s+([^\s]+)\s([^\s]+)\s+([^\s]+)`)
 		matches := re.FindStringSubmatch(line)
 		if len(matches) > 1 {
 			i.architecture = runtime.GOARCH
