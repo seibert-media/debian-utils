@@ -1,7 +1,7 @@
 #!/bin/sh
 
 SOURCEDIRECTORY="github.com/bborbe/debian-utils"
-INSTALLS="github.com/bborbe/debian-utils/bin/create_debian_package github.com/bborbe/debian-utils/bin/create_debian_package_by_config"
+INSTALLS="github.com/bborbe/debian-utils/bin/create_debian_package github.com/bborbe/debian-utils/bin/create_debian_package_by_config github.com/bborbe/debian-utils/bin/update_apt_source_list"
 VERSION="1.0.1-b${BUILD_NUMBER}"
 NAME="debian-utils"
 
