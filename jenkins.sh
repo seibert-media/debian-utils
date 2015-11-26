@@ -21,7 +21,7 @@ do
     go test -i $PACKAGE
     go test -v $PACKAGE | tee $OUT
     cat $OUT
-	/usr/lib/go/bin/go2xunit -fail=true -input $OUT -output $XML
+	/opt/go2xunit/bin/go2xunit -fail=true -input $OUT -output $XML
 	rc=$?
 	if [ $rc != 0 ]
 	then
