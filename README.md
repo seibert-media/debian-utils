@@ -1,17 +1,17 @@
-debian
-======
+Debian Utils
+============
 
 Package provide some debian utils
 
 Documentation
 -------------
 
-http://godoc.org/github.com/bborbe/debian
+http://godoc.org/github.com/bborbe/debian_utils/
 
 Continuous integration
 ----------------------
 
-http://jenkins.benjamin-borbe.de/job/Go-Debian/
+https://www.benjamin-borbe.de/jenkins/job/Go-Debian-Utils/
 
 Copyright and license
 ---------------------

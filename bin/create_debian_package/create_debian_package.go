@@ -6,10 +6,10 @@ import (
 	"os"
 	"runtime"
 
-	debian_command_list "github.com/bborbe/debian-utils/command_list"
-	debian_config_builder "github.com/bborbe/debian-utils/config_builder"
-	debian_copier "github.com/bborbe/debian-utils/copier"
-	debian_package_creator "github.com/bborbe/debian-utils/package_creator"
+	debian_command_list "github.com/bborbe/debian_utils/command_list"
+	debian_config_builder "github.com/bborbe/debian_utils/config_builder"
+	debian_copier "github.com/bborbe/debian_utils/copier"
+	debian_package_creator "github.com/bborbe/debian_utils/package_creator"
 	"github.com/bborbe/log"
 )
 

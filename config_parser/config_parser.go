@@ -3,7 +3,7 @@ package config_parser
 import (
 	"encoding/json"
 
-	debian_config "github.com/bborbe/debian-utils/config"
+	debian_config "github.com/bborbe/debian_utils/config"
 )
 
 type ConfigParser interface {

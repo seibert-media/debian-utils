@@ -3,7 +3,7 @@ package command_list
 import (
 	"fmt"
 
-	"github.com/bborbe/debian-utils/command"
+	"github.com/bborbe/debian_utils/command"
 )
 
 type CommandList interface {

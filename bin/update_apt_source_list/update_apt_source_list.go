@@ -6,8 +6,8 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/bborbe/debian-utils/apt_source_list_updater"
-	"github.com/bborbe/debian-utils/url_downloader"
+	"github.com/bborbe/debian_utils/apt_source_list_updater"
+	"github.com/bborbe/debian_utils/url_downloader"
 	http_client "github.com/bborbe/http/client"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
