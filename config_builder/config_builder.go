@@ -27,8 +27,12 @@ type configBuilder struct {
 }
 
 func New() *configBuilder {
+	return NewWithConfig(debian_config.DefaultConfig())
+}
+
+func NewWithConfig(config *debian_config.Config)  *configBuilder {
 	c := new(configBuilder)
-	c.config = debian_config.DefaultConfig()
+	c.config = config
 	return c
 }
 
