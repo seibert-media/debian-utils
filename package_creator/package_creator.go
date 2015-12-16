@@ -8,8 +8,9 @@ import (
 	"os/exec"
 	"strings"
 
-	debian_command "github.com/bborbe/command"
-	debian_command_list "github.com/bborbe/command/list"
+	command "github.com/bborbe/command"
+	command_adapter "github.com/bborbe/command/adapter"
+	command_list "github.com/bborbe/command/list"
 	debian_config "github.com/bborbe/debian_utils/config"
 	debian_copier "github.com/bborbe/debian_utils/copier"
 	"github.com/bborbe/log"
@@ -26,14 +27,14 @@ type packageCreator struct {
 
 type builder struct {
 	config           *debian_config.Config
-	command_list     debian_command_list.CommandList
+	command_list     command_list.CommandList
 	copier           debian_copier.Copier
 	workingdirectory string
 }
 
 var logger = log.DefaultLogger
 
-type CommandListProvider func() debian_command_list.CommandList
+type CommandListProvider func() command_list.CommandList
 
 func New(commandListProvider CommandListProvider, copier debian_copier.Copier) *packageCreator {
 	p := new(packageCreator)
@@ -61,8 +62,8 @@ func (p *packageCreator) CreatePackage(config *debian_config.Config) error {
 	return b.command_list.Run()
 }
 
-func (b *builder) validateCommand() debian_command.Command {
-	return debian_command.New(func() error {
+func (b *builder) validateCommand() command.Command {
+	return command_adapter.New(func() error {
 		logger.Debug("validate")
 		if len(b.config.Files) == 0 {
 			return fmt.Errorf("add at least one file")
@@ -80,8 +81,8 @@ func (b *builder) validateCommand() debian_command.Command {
 	})
 }
 
-func (b *builder) createWorkingDirectoryCommand() debian_command.Command {
-	return debian_command.New(func() error {
+func (b *builder) createWorkingDirectoryCommand() command.Command {
+	return command_adapter.New(func() error {
 		logger.Debugf("create working directory")
 		var err error
 		if b.workingdirectory, err = ioutil.TempDir("", fmt.Sprintf("%s_%s", b.config.Name, b.config.Version)); err != nil {
@@ -94,8 +95,8 @@ func (b *builder) createWorkingDirectoryCommand() debian_command.Command {
 	})
 }
 
-func (b *builder) createDebianCopyPrePostFilesCommand() debian_command.Command {
-	return debian_command.New(func() error {
+func (b *builder) createDebianCopyPrePostFilesCommand() command.Command {
+	return command_adapter.New(func() error {
 		logger.Debugf("copy pre post inst rm files")
 		var err error
 		path := fmt.Sprintf("%s/%s_%s/DEBIAN", b.workingdirectory, b.config.Name, b.config.Version)
@@ -126,8 +127,8 @@ func (b *builder) createDebianCopyPrePostFilesCommand() debian_command.Command {
 	})
 }
 
-func (b *builder) createDebianFolderCommand() debian_command.Command {
-	return debian_command.New(func() error {
+func (b *builder) createDebianFolderCommand() command.Command {
+	return command_adapter.New(func() error {
 		path := fmt.Sprintf("%s/%s_%s/DEBIAN", b.workingdirectory, b.config.Name, b.config.Version)
 		logger.Debugf("create debian folder %s", path)
 		if err := createDirectory(path); err != nil {
@@ -140,8 +141,8 @@ func (b *builder) createDebianFolderCommand() debian_command.Command {
 	})
 }
 
-func (b *builder) createDebianControlCommand() debian_command.Command {
-	return debian_command.New(func() error {
+func (b *builder) createDebianControlCommand() command.Command {
+	return command_adapter.New(func() error {
 		logger.Debugf("write debian control")
 		if err := ioutil.WriteFile(fmt.Sprintf("%s/%s_%s/DEBIAN/control", b.workingdirectory, b.config.Name, b.config.Version), controlContent(*b.config), 0644); err != nil {
 			return err
@@ -168,8 +169,8 @@ func controlContent(config debian_config.Config) []byte {
 	return buffer.Bytes()
 }
 
-func (b *builder) createDebianConffilesCommand() debian_command.Command {
-	return debian_command.New(func() error {
+func (b *builder) createDebianConffilesCommand() command.Command {
+	return command_adapter.New(func() error {
 		logger.Debugf("write debian conffiles")
 		content := conffilesContent(b.config.Files)
 		if len(content) > 0 {
@@ -196,8 +197,8 @@ func conffilesContent(files []debian_config.File) []byte {
 	return buffer.Bytes()
 }
 
-func (b *builder) createDebianPackageCommand() debian_command.Command {
-	return debian_command.New(func() error {
+func (b *builder) createDebianPackageCommand() command.Command {
+	return command_adapter.New(func() error {
 		logger.Debugf("create debian package")
 		cmd := exec.Command("dpkg-deb", "--build", fmt.Sprintf("%s_%s", b.config.Name, b.config.Version))
 		cmd.Dir = b.workingdirectory
@@ -213,8 +214,8 @@ func (b *builder) createDebianPackageCommand() debian_command.Command {
 	})
 }
 
-func (b *builder) copyDebianPackageCommand() debian_command.Command {
-	return debian_command.New(func() error {
+func (b *builder) copyDebianPackageCommand() command.Command {
+	return command_adapter.New(func() error {
 		logger.Debugf("copy debian package")
 		var dir string
 		var err error
@@ -233,8 +234,8 @@ func (b *builder) copyDebianPackageCommand() debian_command.Command {
 	})
 }
 
-func (b *builder) copyFilesToWorkingDirectoryCommand() debian_command.Command {
-	return debian_command.New(func() error {
+func (b *builder) copyFilesToWorkingDirectoryCommand() command.Command {
+	return command_adapter.New(func() error {
 		logger.Debugf("copy files")
 		for _, file := range b.config.Files {
 			var err error
@@ -258,8 +259,8 @@ func (b *builder) copyFilesToWorkingDirectoryCommand() debian_command.Command {
 	})
 }
 
-func (b *builder) cleanWorkingDirectoryCommand() debian_command.Command {
-	return debian_command.New(func() error {
+func (b *builder) cleanWorkingDirectoryCommand() command.Command {
+	return command_adapter.New(func() error {
 		logger.Debugf("clean working directory")
 		if err := os.RemoveAll(b.workingdirectory); err != nil {
 			return err
