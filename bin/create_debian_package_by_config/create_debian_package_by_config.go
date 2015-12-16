@@ -8,7 +8,7 @@ import (
 	"os"
 	"runtime"
 
-	debian_command_list "github.com/bborbe/debian_utils/command_list"
+	debian_command_list "github.com/bborbe/command/list"
 	debian_config "github.com/bborbe/debian_utils/config"
 	debian_config_parser "github.com/bborbe/debian_utils/config_parser"
 	debian_copier "github.com/bborbe/debian_utils/copier"
