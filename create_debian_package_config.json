@@ -17,10 +17,6 @@
     {
       "source": "bin/create_debian_package",
       "target": "/opt/debian/bin/create_debian_package"
-    },
-    {
-      "source": "bin/create_debian_package_by_config",
-      "target": "/opt/debian/bin/create_debian_package_by_config"
     }
   ]
 }

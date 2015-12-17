@@ -6,8 +6,12 @@ import (
 	"os"
 	"runtime"
 
+	"io/ioutil"
+
 	debian_command_list "github.com/bborbe/command/list"
+	debian_config "github.com/bborbe/debian_utils/config"
 	debian_config_builder "github.com/bborbe/debian_utils/config_builder"
+	debian_config_parser "github.com/bborbe/debian_utils/config_parser"
 	debian_copier "github.com/bborbe/debian_utils/copier"
 	debian_package_creator "github.com/bborbe/debian_utils/package_creator"
 	"github.com/bborbe/log"
@@ -21,11 +25,15 @@ const (
 	PARAMETER_SOURCE   = "source"
 	PARAMETER_TARGET   = "target"
 	PARAMETER_LOGLEVEL = "loglevel"
+	PARAMETER_CONFIG   = "config"
 )
+
+type ConfigBuilderWithConfig func(config *debian_config.Config) debian_config_builder.ConfigBuilder
 
 func main() {
 	defer logger.Close()
 	logLevelPtr := flag.String(PARAMETER_LOGLEVEL, log.INFO_STRING, log.FLAG_USAGE)
+	configPtr := flag.String(PARAMETER_CONFIG, "", "config")
 	namePtr := flag.String(PARAMETER_NAME, "", "name")
 	versionPtr := flag.String(PARAMETER_VERSION, "", "version")
 	sourcePtr := flag.String(PARAMETER_SOURCE, "", "source")
@@ -36,14 +44,18 @@ func main() {
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	copier := debian_copier.New()
-	config_builder := debian_config_builder.New()
-	package_creator := debian_package_creator.New(func() debian_command_list.CommandList {
+	commandProvider := func() debian_command_list.CommandList {
 		return debian_command_list.New()
-	}, copier)
+	}
+	configBuilderWithConfig := func(config *debian_config.Config) debian_config_builder.ConfigBuilder {
+		return debian_config_builder.NewWithConfig(config)
+	}
+	copier := debian_copier.New()
+	package_creator := debian_package_creator.New(commandProvider, copier)
+	config_parser := debian_config_parser.New()
 
 	writer := os.Stdout
-	err := do(writer, config_builder, package_creator, *namePtr, *versionPtr, *sourcePtr, *targetPtr)
+	err := do(writer, config_parser, configBuilderWithConfig, package_creator, *configPtr, *namePtr, *versionPtr, *sourcePtr, *targetPtr)
 	if err != nil {
 		logger.Fatal(err)
 		logger.Close()
@@ -51,17 +63,27 @@ func main() {
 	}
 }
 
-func do(writer io.Writer, config_builder debian_config_builder.ConfigBuilder, package_creator debian_package_creator.PackageCreator, name string, version string, source string, target string) error {
-	logger.Debugf("create deb %s_%s.deb", name, version)
+func do(writer io.Writer,
+	config_parser debian_config_parser.ConfigParser,
+	configBuilderWithConfig ConfigBuilderWithConfig,
+	package_creator debian_package_creator.PackageCreator,
+	configpath string,
+	name string,
+	version string,
+	source string,
+	target string) error {
 	var err error
-	if err = config_builder.AddFile(source, target); err != nil {
+	var content []byte
+	var config *debian_config.Config
+	if content, err = ioutil.ReadFile(configpath); err != nil {
 		return err
 	}
-	if err = config_builder.Name(name); err != nil {
+	if config, err = config_parser.ParseConfig(content); err != nil {
 		return err
 	}
-	if err = config_builder.Version(version); err != nil {
-		return err
-	}
+	config_builder := configBuilderWithConfig(config)
+	config_builder.AddFile(source, target)
+	config_builder.Name(name)
+	config_builder.Version(version)
 	return package_creator.CreatePackage(config_builder.Build())
 }
