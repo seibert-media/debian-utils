@@ -30,7 +30,7 @@ func New() *configBuilder {
 	return NewWithConfig(debian_config.DefaultConfig())
 }
 
-func NewWithConfig(config *debian_config.Config)  *configBuilder {
+func NewWithConfig(config *debian_config.Config) *configBuilder {
 	c := new(configBuilder)
 	c.config = config
 	return c
