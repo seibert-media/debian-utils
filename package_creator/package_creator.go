@@ -200,7 +200,7 @@ func conffilesContent(files []debian_config.File) []byte {
 func (b *builder) createDebianPackageCommand() command.Command {
 	return command_adapter.New(func() error {
 		logger.Debugf("create debian package")
-		cmd := exec.Command("dpkg-deb", "--build", fmt.Sprintf("%s_%s", b.config.Name, b.config.Version))
+		cmd := exec.Command("dpkg-deb", "-Zgzip", "--build", fmt.Sprintf("%s_%s", b.config.Name, b.config.Version))
 		cmd.Dir = b.workingdirectory
 		cmd.Stderr = os.Stderr
 		//cmd.Stdout = os.Stdout
