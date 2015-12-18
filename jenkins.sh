@@ -5,6 +5,8 @@ INSTALLS="github.com/bborbe/debian_utils/bin/create_debian_package github.com/bb
 VERSION="1.0.1-b${BUILD_NUMBER}"
 NAME="debian-utils"
 
+################################################################################
+
 export GOROOT=/opt/go1.5.1
 export PATH=/opt/go2xunit/bin/:/opt/utils/bin/:/opt/aptly_utils/bin/:/opt/aptly/bin/:/opt/debian_utils/bin/:/opt/debian/bin/:$GOROOT/bin:$PATH
 export GOPATH=${WORKSPACE}
