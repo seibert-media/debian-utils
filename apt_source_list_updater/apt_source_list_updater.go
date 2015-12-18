@@ -105,7 +105,9 @@ func (a *aptSourceListUpdater) hasPackages(infos *infos) (bool, error) {
 	logger.Debugf("local packages file: %s", localPackagesFile)
 	localPackagesContent, err := a.readFile(localPackagesFile)
 	if err != nil {
-		return false, err
+		// return false, err
+		// return true if file not found
+		return true, nil
 	}
 	return localPackagesContent != remotePackagesContent, nil
 }
