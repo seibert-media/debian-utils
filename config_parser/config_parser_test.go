@@ -3,6 +3,8 @@ package config_parser
 import (
 	"testing"
 
+	debian_config "github.com/bborbe/debian_utils/config"
+
 	. "github.com/bborbe/assert"
 )
 
@@ -16,7 +18,8 @@ func TestImplementsConfigParser(t *testing.T) {
 }
 
 func TestDefaults(t *testing.T) {
-	config, err := New().ParseConfig([]byte(`{}`))
+	config := debian_config.DefaultConfig()
+	config, err := New().ParseContentToConfig(config, []byte(`{}`))
 	if err = AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
@@ -41,7 +44,8 @@ func TestDefaults(t *testing.T) {
 }
 
 func TestParseConfigArchitecture(t *testing.T) {
-	config, err := New().ParseConfig([]byte(`{"architecture":"amd64"}`))
+	config := debian_config.DefaultConfig()
+	config, err := New().ParseContentToConfig(config, []byte(`{"architecture":"amd64"}`))
 	if err = AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
@@ -54,7 +58,8 @@ func TestParseConfigArchitecture(t *testing.T) {
 }
 
 func TestParseConfigName(t *testing.T) {
-	config, err := New().ParseConfig([]byte(`{"name":"helloworld"}`))
+	config := debian_config.DefaultConfig()
+	config, err := New().ParseContentToConfig(config, []byte(`{"name":"helloworld"}`))
 	if err = AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
@@ -67,7 +72,8 @@ func TestParseConfigName(t *testing.T) {
 }
 
 func TestParseConfigVersion(t *testing.T) {
-	config, err := New().ParseConfig([]byte(`{"version":"1.2.3"}`))
+	config := debian_config.DefaultConfig()
+	config, err := New().ParseContentToConfig(config, []byte(`{"version":"1.2.3"}`))
 	if err = AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
@@ -80,7 +86,8 @@ func TestParseConfigVersion(t *testing.T) {
 }
 
 func TestParseConfigFilesEmpty(t *testing.T) {
-	config, err := New().ParseConfig([]byte(`{"files":[]}`))
+	config := debian_config.DefaultConfig()
+	config, err := New().ParseContentToConfig(config, []byte(`{"files":[]}`))
 	if err = AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
@@ -93,7 +100,8 @@ func TestParseConfigFilesEmpty(t *testing.T) {
 }
 
 func TestParseConfigFiles(t *testing.T) {
-	config, err := New().ParseConfig([]byte(`{"files":[{"source":"/tmp/source.txt","target":"/tmp/target.txt"}]}`))
+	config := debian_config.DefaultConfig()
+	config, err := New().ParseContentToConfig(config, []byte(`{"files":[{"source":"/tmp/source.txt","target":"/tmp/target.txt"}]}`))
 	if err = AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}

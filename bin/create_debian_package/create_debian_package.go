@@ -6,8 +6,6 @@ import (
 	"os"
 	"runtime"
 
-	"io/ioutil"
-
 	debian_command_list "github.com/bborbe/command/list"
 	debian_config "github.com/bborbe/debian_utils/config"
 	debian_config_builder "github.com/bborbe/debian_utils/config_builder"
@@ -73,13 +71,11 @@ func do(writer io.Writer,
 	source string,
 	target string) error {
 	var err error
-	var content []byte
-	var config *debian_config.Config
-	if content, err = ioutil.ReadFile(configpath); err != nil {
-		return err
-	}
-	if config, err = config_parser.ParseConfig(content); err != nil {
-		return err
+	config := debian_config.DefaultConfig()
+	if len(configpath) > 0 {
+		if config, err = config_parser.ParseFileToConfig(config, configpath); err != nil {
+			return err
+		}
 	}
 	config_builder := configBuilderWithConfig(config)
 	config_builder.AddFile(source, target)
