@@ -5,18 +5,15 @@
   "architecture": "amd64",
   "maintainer": "Benjamin Borbe <bborbe@rocketnews.de>",
   "description": "Debian Package Utils",
-  "postrm": "src/github.com/bborbe/debian_utils/files/postrm",
-  "postinst": "src/github.com/bborbe/debian_utils/files/postinst",
-  "prerm": "src/github.com/bborbe/debian_utils/files/prerm",
-  "preinst": "src/github.com/bborbe/debian_utils/files/preinst",
+  "postinst": "src/github.com/bborbe/debian_utils/postinst",
   "files": [
     {
       "source": "bin/update_apt_source_list",
-      "target": "/opt/debian/bin/update_apt_source_list"
+      "target": "/opt/debian_utils/bin/update_apt_source_list"
     },
     {
       "source": "bin/create_debian_package",
-      "target": "/opt/debian/bin/create_debian_package"
+      "target": "/opt/debian_utils/bin/create_debian_package"
     }
   ]
 }

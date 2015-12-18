@@ -1,0 +1,4 @@
+#!/bin/sh
+
+chown -R root:root /opt/debian_utils
+find /opt/debian_utils -type d -exec chmod 755 "{}" \;
