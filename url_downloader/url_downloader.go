@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/bborbe/http/requestbuilder"
+	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 )
 
 type UrlDownloader interface {
@@ -17,7 +17,7 @@ type urlDownloader struct {
 	client                     *http.Client
 }
 
-type HttpRequestBuilderProvider func(url string) requestbuilder.HttpRequestBuilder
+type HttpRequestBuilderProvider func(url string) http_requestbuilder.HttpRequestBuilder
 
 func New(client *http.Client, httpRequestBuilderProvider HttpRequestBuilderProvider) *urlDownloader {
 	u := new(urlDownloader)
