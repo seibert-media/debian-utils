@@ -37,18 +37,22 @@ func (c *copier) CopyDir(source string, target string) error {
 	logger.Debugf("CopyDir %s => %s", source, target)
 	finfo, err := os.Stat(source)
 	if err != nil {
+		logger.Debugf("get stat failed")
 		return err
 	}
-	if err = os.Mkdir(target, finfo.Mode()); err != nil {
+	if err = os.MkdirAll(target, finfo.Mode()); err != nil {
+		logger.Debugf("mkdir target dir failed")
 		return err
 	}
 	dir, err := os.Open(source)
 	defer dir.Close()
 	if err != nil {
+		logger.Debugf("open source failed")
 		return err
 	}
 	files, err := dir.Readdir(-1)
 	if err != nil {
+		logger.Debugf("read source dir failed")
 		return err
 	}
 	for _, file := range files {
