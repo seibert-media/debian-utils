@@ -1,28 +1,68 @@
-Debian Utils
-============
+# Debian Utils
 
 Package provide some debian utils
 
-Documentation
--------------
+## Create Debian Package
 
-http://godoc.org/github.com/bborbe/debian_utils/
+```
+create_debian_package \
+-loglevel=DEBUG \
+-version=1.2.3 \
+-config=create_debian_package_config.json
+```
 
-Continuous integration
-----------------------
+### Sample Config
 
-https://www.benjamin-borbe.de/jenkins/job/Go-Debian-Utils/
+```
+{
+  "name": "debian-utils",
+  "section": "utils",
+  "priority": "optional",
+  "architecture": "amd64",
+  "maintainer": "Benjamin Borbe <bborbe@rocketnews.de>",
+  "description": "Debian Package Utils",
+  "postinst": "src/github.com/bborbe/debian_utils/postinst",
+  "postrm": "src/github.com/bborbe/debian_utils/postrm",
+  "preinst": "src/github.com/bborbe/debian_utils/preinst",
+  "prerm": "src/github.com/bborbe/debian_utils/prerm",
+  "files": [
+    {
+      "source": "bin/update_apt_source_list",
+      "target": "/opt/debian_utils/bin/update_apt_source_list"
+    },
+    {
+      "source": "bin/create_debian_package",
+      "target": "/opt/debian_utils/bin/create_debian_package"
+    }
+  ]
+}
+```
 
-Copyright and license
----------------------
+## Update Apt-Repo
 
-    Copyright (c) 2015, Benjamin Borbe <bborbe@rocketnews.de>
+```
+update_apt_source_list \
+-loglevel=DEBUG \
+-path /etc/apt/sources.list.d/aptly-unstable.benjamin-borbe.de.list
+```
+
+## Documentation
+
+[GoDoc](http://godoc.org/github.com/bborbe/debian_utils/)
+
+## Continuous integration
+
+[Jenkins](https://www.benjamin-borbe.de/jenkins/job/Go-Debian-Utils/)
+
+## Copyright and license
+
+    Copyright (c) 2016, Benjamin Borbe <bborbe@rocketnews.de>
     All rights reserved.
-
+    
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions are
     met:
-
+    
        * Redistributions of source code must retain the above copyright
          notice, this list of conditions and the following disclaimer.
        * Redistributions in binary form must reproduce the above
