@@ -16,7 +16,7 @@ type CreatePackageByReader func(tarGzReader io.Reader, config *debian_config.Con
 type Download func(url string) (resp *http.Response, err error)
 
 type LatestDebianPackageCreator interface {
-	CreateLatestConfluenceDebianPackage(config *debian_config.Config, sourceDir string, targetDir string) error
+	CreateLatestDebianPackage(config *debian_config.Config, sourceDir string, targetDir string) error
 }
 
 type latestDebianPackageCreator struct {
@@ -35,7 +35,7 @@ func New(download Download, latestConfluenceTarGzUrl LatestConfluenceTarGzUrl, l
 	return l
 }
 
-func (l *latestDebianPackageCreator) CreateLatestConfluenceDebianPackage(config *debian_config.Config, sourceDir string, targetDir string) error {
+func (l *latestDebianPackageCreator) CreateLatestDebianPackage(config *debian_config.Config, sourceDir string, targetDir string) error {
 	url, err := l.latestConfluenceTarGzUrl()
 	if err != nil {
 		return err
