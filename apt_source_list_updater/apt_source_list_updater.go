@@ -144,6 +144,16 @@ func ParseLine(line string) (*infos, error) {
 			return i, nil
 		}
 	}
+	{
+		re := regexp.MustCompile(`deb\s+([^\s]+)\s([^\s]+)`)
+		matches := re.FindStringSubmatch(line)
+		if len(matches) > 1 {
+			i.architecture = runtime.GOARCH
+			i.url = matches[1]
+			i.distribution = matches[2]
+			return i, nil
+		}
+	}
 	return nil, fmt.Errorf("parse line failed: %s", line)
 }
 

@@ -75,6 +75,24 @@ func TestParseLineWithAmd64(t *testing.T) {
 	if err = AssertThat(infos.component, Is("main")); err != nil {
 		t.Fatal(err)
 	}
+	if err = AssertThat(infos.architecture, Is(runtime.GOARCH)); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestParseLineWithoutComp(t *testing.T) {
+	var err error
+	var infos *infos
+	infos, err = ParseLine("deb http://aptly.benjamin-borbe.de/stable default\n")
+	if err = AssertThat(err, NilValue()); err != nil {
+		t.Fatal(err)
+	}
+	if err = AssertThat(infos.url, Is("http://aptly.benjamin-borbe.de/stable")); err != nil {
+		t.Fatal(err)
+	}
+	if err = AssertThat(infos.distribution, Is("default")); err != nil {
+		t.Fatal(err)
+	}
 	if err = AssertThat(infos.architecture, Is("amd64")); err != nil {
 		t.Fatal(err)
 	}
