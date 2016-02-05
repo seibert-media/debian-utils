@@ -7,7 +7,7 @@ import (
 )
 
 func TestImplementsDebianPackageCreator(t *testing.T) {
-	b := New(nil, nil)
+	b := New(nil, nil, nil)
 	var i *Creator
 	err := AssertThat(b, Implements(i).Message("check type"))
 	if err != nil {

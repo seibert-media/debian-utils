@@ -1,14 +1,10 @@
 package package_creator_by_reader
 
 import (
-	"archive/tar"
-	"compress/gzip"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
-	"path/filepath"
-
 	"github.com/bborbe/command"
 	command_adapter "github.com/bborbe/command/adapter"
 	command_list "github.com/bborbe/command/list"
@@ -19,31 +15,35 @@ import (
 )
 
 type Creator interface {
-	CreatePackage(tarGzReader io.Reader, config *debian_config.Config, sourceDir string, targetDir string) error
+	CreatePackage(fileReader io.Reader, config *debian_config.Config, sourceDir string, targetDir string) error
 }
 
 var logger = log.DefaultLogger
 
 type CommandListProvider func() command_list.CommandList
+type ExtractFile func(fileReader io.Reader, targetDir string) error
 
 type creator struct {
 	commandListProvider CommandListProvider
 	packageCreator      debian_package_creator.PackageCreator
+	extractFile         ExtractFile
 }
 
-func New(commandListProvider CommandListProvider, debianPackageCreator debian_package_creator.PackageCreator) *creator {
+func New(commandListProvider CommandListProvider, debianPackageCreator debian_package_creator.PackageCreator, extractFile ExtractFile) *creator {
 	d := new(creator)
 	d.commandListProvider = commandListProvider
 	d.packageCreator = debianPackageCreator
+	d.extractFile = extractFile
 	return d
 }
 
-func (d *creator) CreatePackage(tarGzReader io.Reader, config *debian_config.Config, sourceDir string, targetDir string) error {
+func (d *creator) CreatePackage(fileReader io.Reader, config *debian_config.Config, sourceDir string, targetDir string) error {
 	b := new(builder)
 	b.packageCreator = d.packageCreator
+	b.extractFile = d.extractFile
 	b.commandList = d.commandListProvider()
 	b.config = config
-	b.tarGzReader = tarGzReader
+	b.fileReader = fileReader
 	b.commandList.Add(b.createWorkingDirectoryCommand())
 	b.commandList.Add(b.extractTarGzCommand())
 	b.commandList.Add(b.createDebianPackageCommand())
@@ -54,10 +54,11 @@ func (d *creator) CreatePackage(tarGzReader io.Reader, config *debian_config.Con
 }
 
 type builder struct {
+	extractFile      ExtractFile
 	commandList      command_list.CommandList
 	packageCreator   debian_package_creator.PackageCreator
 	workingdirectory string
-	tarGzReader      io.Reader
+	fileReader       io.Reader
 	config           *debian_config.Config
 	path             string
 	targetDir        string
@@ -80,71 +81,8 @@ func (b *builder) createWorkingDirectoryCommand() command.Command {
 
 func (b *builder) extractTarGzCommand() command.Command {
 	return command_adapter.New(func() error {
-		logger.Debugf("extract tar fz")
-
-		gw, err := gzip.NewReader(b.tarGzReader)
-		defer gw.Close()
-		if err != nil {
-			return err
-		}
-
-		tr := tar.NewReader(gw)
-		for {
-			hdr, err := tr.Next()
-			if err == io.EOF {
-				break
-			}
-			if err != nil {
-				return err
-			}
-			path := fmt.Sprintf("%s/%s", b.workingdirectory, hdr.Name)
-			switch hdr.Typeflag {
-			case tar.TypeDir:
-				if err = mkdir(path, os.FileMode(hdr.Mode)); err != nil {
-					return err
-				}
-			case tar.TypeReg:
-				if err = extractFile(path, os.FileMode(hdr.Mode), tr); err != nil {
-					return err
-				}
-			default:
-				logger.Debugf("Can't: %c, %s\n", hdr.Typeflag, path)
-			}
-		}
-
-		logger.Debugf("tar fz extracted")
-		return nil
+		return b.extractFile(b.fileReader, b.workingdirectory)
 	}, func() error { return nil })
-}
-
-func extractFile(path string, mode os.FileMode, tr io.Reader) error {
-	logger.Debugf("extract file: %s %v", path, mode)
-	dir := filepath.Dir(path)
-	_, err := os.Stat(dir)
-	if err != nil {
-		err := mkdir(dir, os.FileMode(0777))
-		if err != nil {
-			return err
-		}
-	}
-	ow, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, mode)
-	defer ow.Close()
-	if err != nil {
-		logger.Debugf("open file failed: %s %v", path, mode)
-		return err
-	}
-	if err != nil {
-		return err
-	}
-	if _, err := io.Copy(ow, tr); err != nil {
-		return err
-	}
-	return nil
-}
-
-func mkdir(path string, mode os.FileMode) error {
-	logger.Debugf("mkdir: %s %v", path, mode)
-	return os.MkdirAll(path, mode)
 }
 
 func (b *builder) createDebianPackageCommand() command.Command {
