@@ -1,12 +1,13 @@
 package zip_extractor
 
 import (
-	"io"
-	"os"
-	"github.com/bborbe/log"
 	"archive/zip"
 	"fmt"
+	"io"
+	"os"
 	"path/filepath"
+
+	"github.com/bborbe/log"
 )
 
 type ZipExtractor interface {
@@ -14,7 +15,6 @@ type ZipExtractor interface {
 }
 
 type zipExtractor struct {
-
 }
 
 func New() *zipExtractor {
@@ -73,7 +73,7 @@ func extractFile(path string, mode os.FileMode, tr io.Reader) error {
 			return err
 		}
 	}
-	ow, err := os.OpenFile(path, os.O_RDWR | os.O_CREATE | os.O_TRUNC, mode)
+	ow, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, mode)
 	defer ow.Close()
 	if err != nil {
 		logger.Debugf("open file failed: %s %v", path, mode)
@@ -94,7 +94,7 @@ func mkdir(path string, mode os.FileMode) error {
 }
 
 func write(fileReader io.Reader, filename string) error {
-	out, err := os.OpenFile(filename, os.O_RDWR | os.O_CREATE | os.O_TRUNC, 0666)
+	out, err := os.OpenFile(filename, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0666)
 	if err != nil {
 		return err
 	}

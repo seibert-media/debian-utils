@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+
 	"github.com/bborbe/log"
 )
 
@@ -15,7 +16,6 @@ type TarGzExtractor interface {
 }
 
 type tarGzExtractor struct {
-
 }
 
 func New() *tarGzExtractor {
@@ -61,7 +61,6 @@ func (e *tarGzExtractor) ExtractTarGz(fileReader io.Reader, targetDir string) er
 	return nil
 }
 
-
 func extractFile(path string, mode os.FileMode, tr io.Reader) error {
 	logger.Debugf("extract file: %s %v", path, mode)
 	dir := filepath.Dir(path)
@@ -72,7 +71,7 @@ func extractFile(path string, mode os.FileMode, tr io.Reader) error {
 			return err
 		}
 	}
-	ow, err := os.OpenFile(path, os.O_RDWR | os.O_CREATE | os.O_TRUNC, mode)
+	ow, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, mode)
 	defer ow.Close()
 	if err != nil {
 		logger.Debugf("open file failed: %s %v", path, mode)

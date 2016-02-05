@@ -6,17 +6,18 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/bborbe/log"
-	"github.com/bborbe/debian_utils/zip_extractor"
 	"fmt"
+
+	"github.com/bborbe/debian_utils/zip_extractor"
+	"github.com/bborbe/log"
 )
 
 var logger = log.DefaultLogger
 
 const (
 	PARAMETER_LOGLEVEL = "loglevel"
-	PARAMETER_ZIP = "zip"
-	PARAMETER_TARGET = "target"
+	PARAMETER_ZIP      = "zip"
+	PARAMETER_TARGET   = "target"
 )
 
 type ExtractZipFile func(filename string, targetDir string) error
