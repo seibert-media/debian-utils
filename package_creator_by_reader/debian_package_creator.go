@@ -45,7 +45,7 @@ func (d *creator) CreatePackage(fileReader io.Reader, config *debian_config.Conf
 	b.config = config
 	b.fileReader = fileReader
 	b.commandList.Add(b.createWorkingDirectoryCommand())
-	b.commandList.Add(b.extractTarGzCommand())
+	b.commandList.Add(b.extractCommand())
 	b.commandList.Add(b.createDebianPackageCommand())
 	b.commandList.Add(b.removeWorkingDirectoryCommand())
 	b.sourceDir = sourceDir
@@ -79,7 +79,7 @@ func (b *builder) createWorkingDirectoryCommand() command.Command {
 	})
 }
 
-func (b *builder) extractTarGzCommand() command.Command {
+func (b *builder) extractCommand() command.Command {
 	return command_adapter.New(func() error {
 		return b.extractFile(b.fileReader, b.workingdirectory)
 	}, func() error { return nil })

@@ -25,7 +25,6 @@ func New() *tarGzExtractor {
 var logger = log.DefaultLogger
 
 func (e *tarGzExtractor) ExtractTarGz(fileReader io.Reader, targetDir string) error {
-
 	logger.Debugf("extract tar fz")
 
 	gw, err := gzip.NewReader(fileReader)

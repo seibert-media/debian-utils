@@ -1,13 +1,12 @@
 package zip_extractor
 
 import (
-	"archive/tar"
-	"compress/gzip"
-	"fmt"
 	"io"
 	"os"
-	"path/filepath"
 	"github.com/bborbe/log"
+	"archive/zip"
+	"fmt"
+	"path/filepath"
 )
 
 type ZipExtractor interface {
@@ -25,43 +24,44 @@ func New() *zipExtractor {
 var logger = log.DefaultLogger
 
 func (e *zipExtractor) ExtractZip(fileReader io.Reader, targetDir string) error {
+	logger.Debugf("extract zip")
 
-	logger.Debugf("extract tar fz")
-
-	gw, err := gzip.NewReader(fileReader)
-	defer gw.Close()
+	filename := "/tmp/test.zip"
+	defer os.Remove(filename)
+	err := write(fileReader, filename)
 	if err != nil {
 		return err
 	}
-
-	tr := tar.NewReader(gw)
-	for {
-		hdr, err := tr.Next()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			return err
-		}
-		path := fmt.Sprintf("%s/%s", targetDir, hdr.Name)
-		switch hdr.Typeflag {
-		case tar.TypeDir:
-			if err = mkdir(path, os.FileMode(hdr.Mode)); err != nil {
-				return err
-			}
-		case tar.TypeReg:
-			if err = extractFile(path, os.FileMode(hdr.Mode), tr); err != nil {
-				return err
-			}
-		default:
-			logger.Debugf("Can't: %c, %s\n", hdr.Typeflag, path)
-		}
-	}
-
-	logger.Debugf("tar fz extracted")
-	return nil
+	return e.ExtractZipFile(filename, targetDir)
 }
 
+func (e *zipExtractor) ExtractZipFile(filename string, targetDir string) error {
+	logger.Debugf("extract zip %s", filename)
+	z, err := zip.OpenReader(filename)
+	if err != nil {
+		return err
+	}
+	for _, f := range z.File {
+		path := fmt.Sprintf("%s/%s", targetDir, f.Name)
+		if f.FileInfo().IsDir() {
+			logger.Debugf("extract dir %s", f.Name)
+			mkdir(path, f.FileInfo().Mode())
+		} else {
+			logger.Debugf("extract file %s", f.Name)
+			reader, err := f.Open()
+			if err != nil {
+				return err
+			}
+			err = extractFile(path, f.FileInfo().Mode(), reader)
+			if err != nil {
+				return err
+			}
+			reader.Close()
+		}
+	}
+	logger.Debugf("zip extracted %s", filename)
+	return nil
+}
 
 func extractFile(path string, mode os.FileMode, tr io.Reader) error {
 	logger.Debugf("extract file: %s %v", path, mode)
@@ -91,4 +91,18 @@ func extractFile(path string, mode os.FileMode, tr io.Reader) error {
 func mkdir(path string, mode os.FileMode) error {
 	logger.Debugf("mkdir: %s %v", path, mode)
 	return os.MkdirAll(path, mode)
+}
+
+func write(fileReader io.Reader, filename string) error {
+	out, err := os.OpenFile(filename, os.O_RDWR | os.O_CREATE | os.O_TRUNC, 0666)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	_, err = io.Copy(out, fileReader)
+	if err != nil {
+		return err
+	}
+	return nil
 }
