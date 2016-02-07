@@ -9,7 +9,8 @@ import (
 	debian_apt_source_list_updater "github.com/bborbe/debian_utils/apt_source_list_updater"
 	debian_url_downloader "github.com/bborbe/debian_utils/url_downloader"
 	http_client "github.com/bborbe/http/client"
-	http_requestbuilder "github.com/bborbe/http/requestbuilder"
+ 	http_client_builder "github.com/bborbe/http/client/builder"
+ 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
 )
 
