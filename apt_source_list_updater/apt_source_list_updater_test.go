@@ -62,11 +62,11 @@ func TestParseLineWithArch(t *testing.T) {
 func TestParseLineWithAmd64(t *testing.T) {
 	var err error
 	var infos *infos
-	infos, err = ParseLine("deb [arch=amd64] http://aptly.benjamin-borbe.de/stable  default main\n")
+	infos, err = ParseLine("deb [arch=amd64] https://www.benjamin-borbe.de/aptly/stable  default main\n")
 	if err = AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
-	if err = AssertThat(infos.url, Is("http://aptly.benjamin-borbe.de/stable")); err != nil {
+	if err = AssertThat(infos.url, Is("https://www.benjamin-borbe.de/aptly/stable")); err != nil {
 		t.Fatal(err)
 	}
 	if err = AssertThat(infos.distribution, Is("default")); err != nil {
@@ -83,11 +83,11 @@ func TestParseLineWithAmd64(t *testing.T) {
 func TestParseLineWithoutComp(t *testing.T) {
 	var err error
 	var infos *infos
-	infos, err = ParseLine("deb http://aptly.benjamin-borbe.de/stable default\n")
+	infos, err = ParseLine("deb https://www.benjamin-borbe.de/aptly/stable default\n")
 	if err = AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
-	if err = AssertThat(infos.url, Is("http://aptly.benjamin-borbe.de/stable")); err != nil {
+	if err = AssertThat(infos.url, Is("https://www.benjamin-borbe.de/aptly/stable")); err != nil {
 		t.Fatal(err)
 	}
 	if err = AssertThat(infos.distribution, Is("default")); err != nil {
