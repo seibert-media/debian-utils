@@ -2,6 +2,14 @@
 
 Package provide some debian utils
 
+## Install
+
+`go get github.com/bborbe/debian_utils/bin/create_debian_package`
+
+`go get github.com/bborbe/debian_utils/bin/extract_zip`
+
+`go get github.com/bborbe/debian_utils/bin/update_apt_source_list`
+
 ## Create Debian Package
 
 ```
