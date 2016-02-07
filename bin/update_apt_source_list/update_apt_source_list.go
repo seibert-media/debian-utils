@@ -9,8 +9,8 @@ import (
 	debian_apt_source_list_updater "github.com/bborbe/debian_utils/apt_source_list_updater"
 	debian_url_downloader "github.com/bborbe/debian_utils/url_downloader"
 
-	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	http_client_builder "github.com/bborbe/http/client_builder"
+	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/bborbe/log"
 )
 
@@ -18,7 +18,7 @@ var logger = log.DefaultLogger
 
 const (
 	PARAMETER_LOGLEVEL = "loglevel"
-	PARAMETER_PATH = "path"
+	PARAMETER_PATH     = "path"
 )
 
 func main() {

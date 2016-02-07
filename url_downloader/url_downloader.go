@@ -8,8 +8,7 @@ import (
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 )
 
-
-type ExecuteRequest func (req *http.Request) (resp *http.Response, err error)
+type ExecuteRequest func(req *http.Request) (resp *http.Response, err error)
 
 type UrlDownloader interface {
 	DownloadUrl(url string) (string, error)
@@ -17,7 +16,7 @@ type UrlDownloader interface {
 
 type urlDownloader struct {
 	httpRequestBuilderProvider HttpRequestBuilderProvider
-	executeRequest                     ExecuteRequest
+	executeRequest             ExecuteRequest
 }
 
 type HttpRequestBuilderProvider func(url string) http_requestbuilder.HttpRequestBuilder
