@@ -34,7 +34,7 @@ func main() {
 	httpClientBuilder := http_client_builder.New().WithoutProxy()
 	httpClient := httpClientBuilder.Build()
 	requestbuilderProvider := http_requestbuilder.NewHttpRequestBuilderProvider()
-	downloader := debian_url_downloader.New(httpClient, requestbuilderProvider.NewHttpRequestBuilder)
+	downloader := debian_url_downloader.New(httpClient.Do, requestbuilderProvider.NewHttpRequestBuilder)
 	updater := debian_apt_source_list_updater.New(downloader.DownloadUrl)
 
 	writer := os.Stdout
