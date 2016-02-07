@@ -8,9 +8,9 @@ import (
 
 	debian_apt_source_list_updater "github.com/bborbe/debian_utils/apt_source_list_updater"
 	debian_url_downloader "github.com/bborbe/debian_utils/url_downloader"
-	http_client "github.com/bborbe/http/client"
+
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
-	http_client_builder "github.com/bborbe/http/client/builder"
+	http_client_builder "github.com/bborbe/http/client_builder"
 	"github.com/bborbe/log"
 )
 
@@ -32,7 +32,7 @@ func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	httpClientBuilder := http_client_builder.New().WithoutProxy()
-	httpClient := http_client.New(httpClientBuilder.Build())
+	httpClient := httpClientBuilder.Build()
 	requestbuilderProvider := http_requestbuilder.NewHttpRequestBuilderProvider()
 	downloader := debian_url_downloader.New(httpClient, requestbuilderProvider.NewHttpRequestBuilder)
 	updater := debian_apt_source_list_updater.New(downloader.DownloadUrl)
