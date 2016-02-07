@@ -8,21 +8,24 @@ import (
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 )
 
+
+type ExecuteRequest func (req *http.Request) (resp *http.Response, err error)
+
 type UrlDownloader interface {
 	DownloadUrl(url string) (string, error)
 }
 
 type urlDownloader struct {
 	httpRequestBuilderProvider HttpRequestBuilderProvider
-	client                     *http.Client
+	executeRequest                     ExecuteRequest
 }
 
 type HttpRequestBuilderProvider func(url string) http_requestbuilder.HttpRequestBuilder
 
-func New(client *http.Client, httpRequestBuilderProvider HttpRequestBuilderProvider) *urlDownloader {
+func New(executeRequest ExecuteRequest, httpRequestBuilderProvider HttpRequestBuilderProvider) *urlDownloader {
 	u := new(urlDownloader)
 	u.httpRequestBuilderProvider = httpRequestBuilderProvider
-	u.client = client
+	u.executeRequest = executeRequest
 	return u
 }
 
@@ -32,7 +35,7 @@ func (u *urlDownloader) DownloadUrl(url string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	resp, err := u.client.Do(req)
+	resp, err := u.executeRequest(req)
 	if err != nil {
 		return "", err
 	}
