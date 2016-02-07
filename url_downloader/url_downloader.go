@@ -31,7 +31,7 @@ func New(executeRequest ExecuteRequest, httpRequestBuilderProvider HttpRequestBu
 
 func (u *urlDownloader) DownloadUrl(url string) (string, error) {
 	rb := u.httpRequestBuilderProvider(url)
-	req, err := rb.GetRequest()
+	req, err := rb.Build()
 	if err != nil {
 		return "", err
 	}
