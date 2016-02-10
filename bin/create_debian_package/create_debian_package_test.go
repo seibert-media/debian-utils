@@ -3,6 +3,8 @@ package main
 import (
 	"testing"
 
+	"bytes"
+
 	. "github.com/bborbe/assert"
 	debian_command_list "github.com/bborbe/command/list"
 	debian_config "github.com/bborbe/debian_utils/config"
@@ -10,12 +12,11 @@ import (
 	debian_config_parser "github.com/bborbe/debian_utils/config_parser"
 	debian_copier "github.com/bborbe/debian_utils/copier"
 	debian_package_creator "github.com/bborbe/debian_utils/package_creator"
-	io_mock "github.com/bborbe/io/mock"
 )
 
 func TestDo(t *testing.T) {
 	var err error
-	writer := io_mock.NewWriter()
+	writer := bytes.NewBufferString("")
 
 	commandProvider := func() debian_command_list.CommandList {
 		return debian_command_list.New()
