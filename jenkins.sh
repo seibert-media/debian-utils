@@ -1,7 +1,7 @@
 #!/bin/sh
 
 SOURCEDIRECTORY="github.com/bborbe/debian_utils"
-INSTALLS=`cd src && find $SOURCEDIRECTORY -name "*.go" | dirof | unique`
+INSTALLS=`cd src && find $SOURCEDIRECTORY/bin -name "*.go" | dirof | unique`
 VERSION="1.0.1-b${BUILD_NUMBER}"
 NAME="debian-utils"
 
