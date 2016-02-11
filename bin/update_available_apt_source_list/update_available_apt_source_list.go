@@ -7,6 +7,7 @@ import (
 	"runtime"
 
 	debian_apt_source_has_changed "github.com/bborbe/debian_utils/apt_source_has_changed"
+	debian_line_inspector "github.com/bborbe/debian_utils/apt_source_line_inspector"
 	debian_url_downloader "github.com/bborbe/debian_utils/url_downloader"
 
 	http_client_builder "github.com/bborbe/http/client_builder"
@@ -35,7 +36,8 @@ func main() {
 	httpClient := httpClientBuilder.Build()
 	requestbuilderProvider := http_requestbuilder.NewHttpRequestBuilderProvider()
 	downloader := debian_url_downloader.New(httpClient.Do, requestbuilderProvider.NewHttpRequestBuilder)
-	hasChanged := debian_apt_source_has_changed.New(downloader.DownloadUrl)
+	lineInspector := debian_line_inspector.New(downloader.DownloadUrl)
+	hasChanged := debian_apt_source_has_changed.New(lineInspector.HasLineChanged)
 
 	writer := os.Stdout
 	bool, err := do(writer, hasChanged, *pathPtr)

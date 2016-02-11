@@ -1,9 +1,9 @@
 package apt_source_has_changed
 
 import (
+	"fmt"
+	"io"
 	"testing"
-
-	"runtime"
 
 	. "github.com/bborbe/assert"
 )
@@ -11,125 +11,196 @@ import (
 func TestImplementsAptSourceListUpdater(t *testing.T) {
 	b := New(nil)
 	var i *AptSourceHasChanged
-	err := AssertThat(b, Implements(i).Message("check type"))
-	if err != nil {
+	if err := AssertThat(b, Implements(i).Message("check type")); err != nil {
 		t.Fatal(err)
 	}
 }
 
-func TestParseLine(t *testing.T) {
-	var err error
-	var infos *infos
-	infos, err = ParseLine("deb https://example.com/repo dist comp")
-	if err = AssertThat(err, NilValue()); err != nil {
+// err == eof ==> return haschangedresult
+// err == nil ==> return haschangedresult
+// err != nil && err != eof => return false,err
+
+func TestHasFileChangedReturnError(t *testing.T) {
+	hasLineChangedCounter := 0
+	readStringCounter := 0
+	hasLineChanged := func(line string) (bool, error) {
+		hasLineChangedCounter++
+		return false, nil
+	}
+	readString := func(delim byte) (line string, err error) {
+		readStringCounter++
+		return "foo", fmt.Errorf("custom error")
+	}
+	result, err := hasFileChanged(readString, hasLineChanged)
+	if err := AssertThat(err, NotNilValue()); err != nil {
 		t.Fatal(err)
 	}
-	if err = AssertThat(infos.url, Is("https://example.com/repo")); err != nil {
+	if err := AssertThat(result, Is(false)); err != nil {
 		t.Fatal(err)
 	}
-	if err = AssertThat(infos.distribution, Is("dist")); err != nil {
+	if err := AssertThat(readStringCounter, Is(1)); err != nil {
 		t.Fatal(err)
 	}
-	if err = AssertThat(infos.component, Is("comp")); err != nil {
-		t.Fatal(err)
-	}
-	if err = AssertThat(infos.architecture, Is(runtime.GOARCH)); err != nil {
+	if err := AssertThat(hasLineChangedCounter, Is(0)); err != nil {
 		t.Fatal(err)
 	}
 }
 
-func TestParseLineWithArch(t *testing.T) {
-	var err error
-	var infos *infos
-	infos, err = ParseLine("deb [arch=all] https://example.com/repo dist comp")
-	if err = AssertThat(err, NilValue()); err != nil {
+func TestHasFileChangedReturnEofFalse(t *testing.T) {
+	hasLineChangedCounter := 0
+	readStringCounter := 0
+	hasLineChanged := func(line string) (bool, error) {
+		hasLineChangedCounter++
+		return false, nil
+	}
+	readString := func(delim byte) (line string, err error) {
+		readStringCounter++
+		return "foo", io.EOF
+	}
+	result, err := hasFileChanged(readString, hasLineChanged)
+	if err := AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
-	if err = AssertThat(infos.url, Is("https://example.com/repo")); err != nil {
+	if err := AssertThat(result, Is(false)); err != nil {
 		t.Fatal(err)
 	}
-	if err = AssertThat(infos.distribution, Is("dist")); err != nil {
+	if err := AssertThat(readStringCounter, Is(1)); err != nil {
 		t.Fatal(err)
 	}
-	if err = AssertThat(infos.component, Is("comp")); err != nil {
-		t.Fatal(err)
-	}
-	if err = AssertThat(infos.architecture, Is("all")); err != nil {
-		t.Fatal(err)
-	}
-}
-
-func TestParseLineWithAmd64(t *testing.T) {
-	var err error
-	var infos *infos
-	infos, err = ParseLine("deb [arch=amd64] https://www.benjamin-borbe.de/aptly/stable  default main\n")
-	if err = AssertThat(err, NilValue()); err != nil {
-		t.Fatal(err)
-	}
-	if err = AssertThat(infos.url, Is("https://www.benjamin-borbe.de/aptly/stable")); err != nil {
-		t.Fatal(err)
-	}
-	if err = AssertThat(infos.distribution, Is("default")); err != nil {
-		t.Fatal(err)
-	}
-	if err = AssertThat(infos.component, Is("main")); err != nil {
-		t.Fatal(err)
-	}
-	if err = AssertThat(infos.architecture, Is(runtime.GOARCH)); err != nil {
+	if err := AssertThat(hasLineChangedCounter, Is(1)); err != nil {
 		t.Fatal(err)
 	}
 }
 
-func TestParseLineWithoutComp(t *testing.T) {
-	var err error
-	var infos *infos
-	infos, err = ParseLine("deb https://www.benjamin-borbe.de/aptly/stable default\n")
-	if err = AssertThat(err, NilValue()); err != nil {
+func TestHasFileChangedReturnEofTrue(t *testing.T) {
+	hasLineChangedCounter := 0
+	readStringCounter := 0
+	hasLineChanged := func(line string) (bool, error) {
+		hasLineChangedCounter++
+		return true, nil
+	}
+	readString := func(delim byte) (line string, err error) {
+		readStringCounter++
+		return "foo", io.EOF
+	}
+	result, err := hasFileChanged(readString, hasLineChanged)
+	if err := AssertThat(err, NilValue()); err != nil {
 		t.Fatal(err)
 	}
-	if err = AssertThat(infos.url, Is("https://www.benjamin-borbe.de/aptly/stable")); err != nil {
+	if err := AssertThat(result, Is(true)); err != nil {
 		t.Fatal(err)
 	}
-	if err = AssertThat(infos.distribution, Is("default")); err != nil {
+	if err := AssertThat(readStringCounter, Is(1)); err != nil {
 		t.Fatal(err)
 	}
-	if err = AssertThat(infos.architecture, Is("amd64")); err != nil {
-		t.Fatal(err)
-	}
-}
-
-func TestRemotePackagesUrl(t *testing.T) {
-	infos := &infos{
-		url:          "http://www.example.com/repo",
-		distribution: "default",
-		architecture: "all",
-		component:    "main",
-	}
-	if err := AssertThat(infos.RemotePackagesUrl(), Is("http://www.example.com/repo/dists/default/main/binary-all/Packages")); err != nil {
+	if err := AssertThat(hasLineChangedCounter, Is(1)); err != nil {
 		t.Fatal(err)
 	}
 }
 
-func TestLocalPackagesFile(t *testing.T) {
-	infos := &infos{
-		url:          "http://www.example.com/repo",
-		distribution: "default",
-		architecture: "all",
-		component:    "main",
+func TestHasFileChangedReturnEofError(t *testing.T) {
+	hasLineChangedCounter := 0
+	readStringCounter := 0
+	hasLineChanged := func(line string) (bool, error) {
+		hasLineChangedCounter++
+		return false, fmt.Errorf("foo")
 	}
-	if err := AssertThat(infos.LocalPackagesFile(), Is("/var/lib/apt/lists/www.example.com_repo_dists_default_main_binary-all_Packages")); err != nil {
+	readString := func(delim byte) (line string, err error) {
+		readStringCounter++
+		return "foo", io.EOF
+	}
+	result, err := hasFileChanged(readString, hasLineChanged)
+	if err := AssertThat(err, NotNilValue()); err != nil {
+		t.Fatal(err)
+	}
+	if err := AssertThat(result, Is(false)); err != nil {
+		t.Fatal(err)
+	}
+	if err := AssertThat(readStringCounter, Is(1)); err != nil {
+		t.Fatal(err)
+	}
+	if err := AssertThat(hasLineChangedCounter, Is(1)); err != nil {
 		t.Fatal(err)
 	}
 }
 
-func TestLocalPackagesFileWithAuth(t *testing.T) {
-	infos := &infos{
-		url:          "http://user:passs@www.example.com/repo",
-		distribution: "default",
-		architecture: "all",
-		component:    "main",
+func TestHasFileChangedTrue(t *testing.T) {
+	hasLineChangedCounter := 0
+	readStringCounter := 0
+	hasLineChanged := func(line string) (bool, error) {
+		hasLineChangedCounter++
+		return true, nil
 	}
-	if err := AssertThat(infos.LocalPackagesFile(), Is("/var/lib/apt/lists/www.example.com_repo_dists_default_main_binary-all_Packages")); err != nil {
+	readString := func(delim byte) (line string, err error) {
+		readStringCounter++
+		return "foo", nil
+	}
+	result, err := hasFileChanged(readString, hasLineChanged)
+	if err := AssertThat(err, NilValue()); err != nil {
+		t.Fatal(err)
+	}
+	if err := AssertThat(result, Is(true)); err != nil {
+		t.Fatal(err)
+	}
+	if err := AssertThat(readStringCounter, Is(1)); err != nil {
+		t.Fatal(err)
+	}
+	if err := AssertThat(hasLineChangedCounter, Is(1)); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestHasFileChangedFalse(t *testing.T) {
+	hasLineChangedCounter := 0
+	readStringCounter := 0
+	hasLineChanged := func(line string) (bool, error) {
+		hasLineChangedCounter++
+		return false, nil
+	}
+	readString := func(delim byte) (line string, err error) {
+		readStringCounter++
+		if readStringCounter > 1 {
+			return "", io.EOF
+		}
+		return "foo", nil
+	}
+	result, err := hasFileChanged(readString, hasLineChanged)
+	if err := AssertThat(err, NilValue()); err != nil {
+		t.Fatal(err)
+	}
+	if err := AssertThat(result, Is(false)); err != nil {
+		t.Fatal(err)
+	}
+	if err := AssertThat(readStringCounter, Is(2)); err != nil {
+		t.Fatal(err)
+	}
+	if err := AssertThat(hasLineChangedCounter, Is(2)); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestHasFileChangedError(t *testing.T) {
+	hasLineChangedCounter := 0
+	readStringCounter := 0
+	hasLineChanged := func(line string) (bool, error) {
+		hasLineChangedCounter++
+		return false, fmt.Errorf("custom error")
+	}
+	readString := func(delim byte) (line string, err error) {
+		readStringCounter++
+		return "foo", nil
+	}
+	result, err := hasFileChanged(readString, hasLineChanged)
+	if err := AssertThat(err, NotNilValue()); err != nil {
+		t.Fatal(err)
+	}
+	if err := AssertThat(result, Is(false)); err != nil {
+		t.Fatal(err)
+	}
+	if err := AssertThat(readStringCounter, Is(1)); err != nil {
+		t.Fatal(err)
+	}
+	if err := AssertThat(hasLineChangedCounter, Is(1)); err != nil {
 		t.Fatal(err)
 	}
 }
