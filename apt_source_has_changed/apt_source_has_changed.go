@@ -45,6 +45,7 @@ func (a *aptSourceHasChanged) HasFileChanged(path string) (bool, error) {
 		var changed bool
 		if line, err = in.ReadString('\n'); err != nil {
 			if err == io.EOF {
+				logger.Debugf("nothing has changed => false")
 				return false, nil
 			}
 			return false, err
@@ -53,11 +54,10 @@ func (a *aptSourceHasChanged) HasFileChanged(path string) (bool, error) {
 			return false, err
 		}
 		if changed {
-			logger.Debugf("line has changed")
+			logger.Debugf("line has changed => true")
 			return true, nil
 		}
 	}
-	return false, nil
 }
 
 func (a *aptSourceHasChanged) hasLineChanged(line string) (bool, error) {
