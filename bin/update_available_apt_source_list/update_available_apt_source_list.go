@@ -45,8 +45,10 @@ func main() {
 		os.Exit(1)
 	}
 	if bool {
+		logger.Close()
 		os.Exit(0)
 	} else {
+		logger.Close()
 		os.Exit(1)
 	}
 }
