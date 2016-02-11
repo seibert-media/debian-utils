@@ -14,6 +14,10 @@
     {
       "source": "bin/create_debian_package",
       "target": "/opt/debian_utils/bin/create_debian_package"
+    },
+    {
+      "source": "bin/update_available_apt_source_list",
+      "target": "/opt/debian_utils/bin/update_available_apt_source_list"
     }
   ]
 }
