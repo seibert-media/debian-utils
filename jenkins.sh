@@ -1,8 +1,6 @@
 #!/bin/sh
 
 SOURCEDIRECTORY="github.com/bborbe/debian_utils"
-INSTALLS=`cd src && find $SOURCEDIRECTORY/bin -name "*.go" | dirof | unique`
-echo "installs $INSTALLS"
 VERSION="1.0.1-b${BUILD_NUMBER}"
 NAME="debian-utils"
 
@@ -12,6 +10,8 @@ export GOROOT=/opt/go
 export PATH=/opt/go2xunit/bin/:/opt/utils/bin/:/opt/aptly_utils/bin/:/opt/aptly/bin/:/opt/debian_utils/bin/:/opt/debian/bin/:$GOROOT/bin:$PATH
 export GOPATH=${WORKSPACE}
 export REPORT_DIR=${WORKSPACE}/test-reports
+INSTALLS=`cd src && find $SOURCEDIRECTORY/bin -name "*.go" | dirof | unique`
+echo "installs $INSTALLS"
 DEB="${NAME}_${VERSION}.deb"
 rm -rf $REPORT_DIR ${WORKSPACE}/*.deb ${WORKSPACE}/pkg
 mkdir -p $REPORT_DIR
