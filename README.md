@@ -54,10 +54,6 @@ update_apt_source_list \
 -path /etc/apt/sources.list.d/aptly-unstable.benjamin-borbe.de.list
 ```
 
-## Documentation
-
-[GoDoc](http://godoc.org/github.com/bborbe/debian_utils/)
-
 ## Continuous integration
 
 [Jenkins](https://www.benjamin-borbe.de/jenkins/job/Go-Debian-Utils/)
