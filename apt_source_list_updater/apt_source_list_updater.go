@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"os/exec"
 
+	"path/filepath"
+
 	"github.com/bborbe/log"
 )
 
@@ -42,6 +44,10 @@ func (a *aptSourceListUpdater) UpdateAptSourceList(path string) error {
 }
 
 func (a *aptSourceListUpdater) update(path string) error {
+	path, err := filepath.Abs(path)
+	if err != nil {
+		return err
+	}
 	args := []string{"update", "-o", fmt.Sprintf("Dir::Etc::sourcelist=%s", path), "-o", "Dir::Etc::sourceparts=-", "-o", "APT::Get::List-Cleanup=0"}
 	cmd := exec.Command("apt-get", args...)
 	cmd.Stdout = os.Stdout

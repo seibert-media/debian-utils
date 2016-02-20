@@ -116,10 +116,10 @@ func (i *infos) LocalPackagesFile() string {
 	atPos := strings.Index(i.url, "@")
 	var host string
 	if atPos != -1 {
-		host = i.url[atPos + 1:]
+		host = i.url[atPos+1:]
 	} else {
 		pos := strings.Index(i.url, "://")
-		host = i.url[pos + 3:]
+		host = i.url[pos+3:]
 	}
 	return fmt.Sprintf("/var/lib/apt/lists/%s_dists_%s_%s_binary-%s_Packages", strings.Replace(host, "/", "_", -1), i.distribution, i.component, i.architecture)
 }
