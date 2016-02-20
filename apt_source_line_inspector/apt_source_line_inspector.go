@@ -38,7 +38,7 @@ func (a *lineInspector) HasLineChanged(line string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	return a.hasPackages(infos)
+	return a.compareLocalAndRemotePackage(infos)
 }
 
 type infos struct {
@@ -49,6 +49,7 @@ type infos struct {
 }
 
 func ParseLine(line string) (*infos, error) {
+	logger.Debugf("parse line %s", line)
 	i := new(infos)
 	{
 		re := regexp.MustCompile(`deb\s+\[arch=(.*?)\]\s+([^\s]+)\s+([^\s]+)\s+([^\s]+)`)
@@ -85,22 +86,26 @@ func ParseLine(line string) (*infos, error) {
 	return nil, fmt.Errorf("parse line failed: %s", line)
 }
 
-func (a *lineInspector) hasPackages(infos *infos) (bool, error) {
+func (a *lineInspector) compareLocalAndRemotePackage(infos *infos) (bool, error) {
 	remotePackagesUrl := infos.RemotePackagesUrl()
 	logger.Debugf("remote packages url: %s", remotePackagesUrl)
 	remotePackagesContent, err := a.downloadUrl(remotePackagesUrl)
 	if err != nil {
+		logger.Debugf("fetch remote package failed => return false")
 		return false, err
 	}
 	localPackagesFile := infos.LocalPackagesFile()
 	logger.Debugf("local packages file: %s", localPackagesFile)
 	localPackagesContent, err := a.readFile(localPackagesFile)
 	if err != nil {
+		logger.Debugf("read local package failed => return true")
 		// return false, err
 		// return true if file not found
 		return true, nil
 	}
-	return localPackagesContent != remotePackagesContent, nil
+	result := localPackagesContent != remotePackagesContent
+	logger.Debugf("compare local and remote %v", result)
+	return result, nil
 }
 
 func (i *infos) RemotePackagesUrl() string {
@@ -111,10 +116,10 @@ func (i *infos) LocalPackagesFile() string {
 	atPos := strings.Index(i.url, "@")
 	var host string
 	if atPos != -1 {
-		host = i.url[atPos+1:]
+		host = i.url[atPos + 1:]
 	} else {
 		pos := strings.Index(i.url, "://")
-		host = i.url[pos+3:]
+		host = i.url[pos + 3:]
 	}
 	return fmt.Sprintf("/var/lib/apt/lists/%s_dists_%s_%s_binary-%s_Packages", strings.Replace(host, "/", "_", -1), i.distribution, i.component, i.architecture)
 }
