@@ -5,7 +5,9 @@ import (
 	"io"
 	"os"
 	"runtime"
-
+	http_client_builder "github.com/bborbe/http/client_builder"
+	http_requestbuilder "github.com/bborbe/http/requestbuilder"
+	"github.com/bborbe/log"
 	debian_command_list "github.com/bborbe/command/list"
 	debian_config "github.com/bborbe/debian_utils/config"
 	debian_config_builder "github.com/bborbe/debian_utils/config_builder"
@@ -14,18 +16,17 @@ import (
 	debian_package_creator "github.com/bborbe/debian_utils/package_creator"
 	debian_tar_gz_extractor "github.com/bborbe/debian_utils/tar_gz_extractor"
 	debian_zip_extractor "github.com/bborbe/debian_utils/zip_extractor"
-	"github.com/bborbe/log"
 )
 
 var logger = log.DefaultLogger
 
 const (
-	PARAMETER_NAME     = "name"
-	PARAMETER_VERSION  = "version"
-	PARAMETER_SOURCE   = "source"
-	PARAMETER_TARGET   = "target"
+	PARAMETER_NAME = "name"
+	PARAMETER_VERSION = "version"
+	PARAMETER_SOURCE = "source"
+	PARAMETER_TARGET = "target"
 	PARAMETER_LOGLEVEL = "loglevel"
-	PARAMETER_CONFIG   = "config"
+	PARAMETER_CONFIG = "config"
 )
 
 type ConfigBuilderWithConfig func(config *debian_config.Config) debian_config_builder.ConfigBuilder
@@ -53,7 +54,10 @@ func main() {
 	copier := debian_copier.New()
 	zipExtractor := debian_zip_extractor.New()
 	tarGzExtractor := debian_tar_gz_extractor.New()
-	package_creator := debian_package_creator.New(commandProvider, copier, tarGzExtractor.ExtractTarGz, zipExtractor.ExtractZip)
+	httpClientBuilder := http_client_builder.New().WithoutProxy()
+	httpClient := httpClientBuilder.Build()
+	requestbuilderProvider := http_requestbuilder.NewHttpRequestBuilderProvider()
+	package_creator := debian_package_creator.New(commandProvider, copier, tarGzExtractor.ExtractTarGz, zipExtractor.ExtractZip, httpClient.Do, requestbuilderProvider.NewHttpRequestBuilder)
 	config_parser := debian_config_parser.New()
 
 	writer := os.Stdout
@@ -66,14 +70,14 @@ func main() {
 }
 
 func do(writer io.Writer,
-	config_parser debian_config_parser.ConfigParser,
-	configBuilderWithConfig ConfigBuilderWithConfig,
-	package_creator debian_package_creator.PackageCreator,
-	configpath string,
-	name string,
-	version string,
-	source string,
-	target string) error {
+config_parser debian_config_parser.ConfigParser,
+configBuilderWithConfig ConfigBuilderWithConfig,
+package_creator debian_package_creator.PackageCreator,
+configpath string,
+name string,
+version string,
+source string,
+target string) error {
 	var err error
 	config := debian_config.DefaultConfig()
 	if len(configpath) > 0 {

@@ -9,6 +9,7 @@ import (
 )
 
 type ExecuteRequest func(req *http.Request) (resp *http.Response, err error)
+type HttpRequestBuilderProvider func(url string) http_requestbuilder.HttpRequestBuilder
 
 type UrlDownloader interface {
 	DownloadUrl(url string) (string, error)
@@ -18,8 +19,6 @@ type urlDownloader struct {
 	httpRequestBuilderProvider HttpRequestBuilderProvider
 	executeRequest             ExecuteRequest
 }
-
-type HttpRequestBuilderProvider func(url string) http_requestbuilder.HttpRequestBuilder
 
 func New(executeRequest ExecuteRequest, httpRequestBuilderProvider HttpRequestBuilderProvider) *urlDownloader {
 	u := new(urlDownloader)
@@ -38,7 +37,7 @@ func (u *urlDownloader) DownloadUrl(url string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	if resp.StatusCode/100 != 2 {
+	if resp.StatusCode / 100 != 2 {
 		return "", fmt.Errorf("get url failed: %s", url)
 	}
 	content, err := ioutil.ReadAll(resp.Body)

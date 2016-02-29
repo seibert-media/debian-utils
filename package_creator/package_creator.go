@@ -16,41 +16,51 @@ import (
 	debian_config "github.com/bborbe/debian_utils/config"
 	debian_copier "github.com/bborbe/debian_utils/copier"
 	"github.com/bborbe/log"
+	"net/http"
+	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 )
 
 type ExtractZipFile func(fileReader io.Reader, targetDir string) error
 type ExtractTarGz func(fileReader io.Reader, targetDir string) error
+type ExecuteRequest func(req *http.Request) (resp *http.Response, err error)
+type HttpRequestBuilderProvider func(url string) http_requestbuilder.HttpRequestBuilder
 
 type PackageCreator interface {
 	CreatePackage(config *debian_config.Config) error
 }
 
 type packageCreator struct {
-	commandListProvider CommandListProvider
-	copier              debian_copier.Copier
-	extractZipFile      ExtractZipFile
-	extractTarGz        ExtractTarGz
+	commandListProvider        CommandListProvider
+	copier                     debian_copier.Copier
+	extractZipFile             ExtractZipFile
+	extractTarGz               ExtractTarGz
+	executeRequest             ExecuteRequest
+	httpRequestBuilderProvider HttpRequestBuilderProvider
 }
 
 type builder struct {
-	config           *debian_config.Config
-	command_list     command_list.CommandList
-	copier           debian_copier.Copier
-	workingdirectory string
-	extractZipFile   ExtractZipFile
-	extractTarGz     ExtractTarGz
+	config                     *debian_config.Config
+	command_list               command_list.CommandList
+	copier                     debian_copier.Copier
+	workingdirectory           string
+	extractZipFile             ExtractZipFile
+	extractTarGz               ExtractTarGz
+	executeRequest             ExecuteRequest
+	httpRequestBuilderProvider HttpRequestBuilderProvider
 }
 
 var logger = log.DefaultLogger
 
 type CommandListProvider func() command_list.CommandList
 
-func New(commandListProvider CommandListProvider, copier debian_copier.Copier, extractTarGz ExtractTarGz, extractZipFile ExtractZipFile) *packageCreator {
+func New(commandListProvider CommandListProvider, copier debian_copier.Copier, extractTarGz ExtractTarGz, extractZipFile ExtractZipFile, executeRequest ExecuteRequest, httpRequestBuilderProvider HttpRequestBuilderProvider) *packageCreator {
 	p := new(packageCreator)
 	p.commandListProvider = commandListProvider
 	p.copier = copier
 	p.extractZipFile = extractZipFile
 	p.extractTarGz = extractTarGz
+	p.executeRequest = executeRequest
+	p.httpRequestBuilderProvider = httpRequestBuilderProvider
 	return p
 }
 
@@ -61,6 +71,8 @@ func (p *packageCreator) CreatePackage(config *debian_config.Config) error {
 	b.config = config
 	b.extractTarGz = p.extractTarGz
 	b.extractZipFile = p.extractZipFile
+	b.executeRequest = p.executeRequest
+	b.httpRequestBuilderProvider = p.httpRequestBuilderProvider
 	logger.Debug("CreatePackage")
 	b.command_list.Add(b.validateCommand())
 	b.command_list.Add(b.createWorkingDirectoryCommand())
@@ -265,7 +277,7 @@ func (b *builder) copyFilesToWorkingDirectoryCommand() command.Command {
 			if file.Extract {
 				if strings.HasSuffix(file.Source, ".zip") {
 					logger.Debugf("is zip => extract")
-					f, err := os.Open(file.Source)
+					f, err := b.fileToReader(file.Source)
 					if err != nil {
 						return err
 					}
@@ -274,7 +286,7 @@ func (b *builder) copyFilesToWorkingDirectoryCommand() command.Command {
 				}
 				if strings.HasSuffix(file.Source, ".tar.gz") || strings.HasSuffix(file.Source, ".tgz") {
 					logger.Debugf("is tar gz => extract")
-					f, err := os.Open(file.Source)
+					f, err := b.fileToReader(file.Source)
 					if err != nil {
 						return err
 					}
@@ -282,6 +294,23 @@ func (b *builder) copyFilesToWorkingDirectoryCommand() command.Command {
 					return b.extractTarGz(f, filename)
 				}
 				return fmt.Errorf("unkown file type")
+			}
+			if isUrl(file.Source) {
+				logger.Debugf("%s is url", file.Source)
+				f, err := b.fileToReader(file.Source)
+				if err != nil {
+					return err
+				}
+				defer f.Close()
+				var perm os.FileMode = 0644
+				w, err := os.OpenFile(filename, os.O_WRONLY | os.O_CREATE | os.O_TRUNC, perm)
+				if err != nil {
+					return err
+				}
+				defer w.Close()
+				if _, err = io.Copy(w, f); err != nil {
+					return err
+				}
 			}
 			if err = b.copier.Copy(file.Source, filename); err != nil {
 				return err
@@ -292,6 +321,28 @@ func (b *builder) copyFilesToWorkingDirectoryCommand() command.Command {
 	}, func() error {
 		return nil
 	})
+}
+func isUrl(path string) bool {
+	return strings.HasPrefix(path, "https://") || strings.HasPrefix(path, "http://")
+}
+
+func (b *builder) fileToReader(path string) (io.ReadCloser, error) {
+	if isUrl(path) {
+		rb := b.httpRequestBuilderProvider(path)
+		req, err := rb.Build()
+		if err != nil {
+			return nil, err
+		}
+		resp, err := b.executeRequest(req)
+		if err != nil {
+			return nil, err
+		}
+		if resp.StatusCode / 100 != 2 {
+			return nil, fmt.Errorf("get url failed: %s", path)
+		}
+		return resp.Body, nil
+	}
+	return os.Open(path)
 }
 
 func (b *builder) cleanWorkingDirectoryCommand() command.Command {
@@ -315,7 +366,7 @@ func createDirectory(directory string) error {
 func dirOf(filename string) (string, error) {
 	pos := strings.LastIndex(filename, "/")
 	if pos != -1 {
-		return filename[:pos+1], nil
+		return filename[:pos + 1], nil
 	}
 	return "", fmt.Errorf("can't determine directory of file %s", filename)
 }
