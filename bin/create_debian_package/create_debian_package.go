@@ -12,6 +12,8 @@ import (
 	debian_config_parser "github.com/bborbe/debian_utils/config_parser"
 	debian_copier "github.com/bborbe/debian_utils/copier"
 	debian_package_creator "github.com/bborbe/debian_utils/package_creator"
+	debian_tar_gz_extractor "github.com/bborbe/debian_utils/tar_gz_extractor"
+	debian_zip_extractor "github.com/bborbe/debian_utils/zip_extractor"
 	"github.com/bborbe/log"
 )
 
@@ -49,7 +51,9 @@ func main() {
 		return debian_config_builder.NewWithConfig(config)
 	}
 	copier := debian_copier.New()
-	package_creator := debian_package_creator.New(commandProvider, copier)
+	zipExtractor := debian_zip_extractor.New()
+	tarGzExtractor := debian_tar_gz_extractor.New()
+	package_creator := debian_package_creator.New(commandProvider, copier, tarGzExtractor.ExtractTarGz, zipExtractor.ExtractZip)
 	config_parser := debian_config_parser.New()
 
 	writer := os.Stdout

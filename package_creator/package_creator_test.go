@@ -7,7 +7,7 @@ import (
 )
 
 func TestImplementsPackageCreator(t *testing.T) {
-	b := New(nil, nil)
+	b := New(nil, nil, nil, nil)
 	var i *PackageCreator
 	err := AssertThat(b, Implements(i).Message("check type"))
 	if err != nil {

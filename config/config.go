@@ -1,8 +1,9 @@
 package config
 
 type File struct {
-	Source string `json:"source"`
-	Target string `json:"target"`
+	Source  string `json:"source"`
+	Target  string `json:"target"`
+	Extract bool   `json:extract`
 }
 
 type Config struct {

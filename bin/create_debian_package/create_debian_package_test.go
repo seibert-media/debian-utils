@@ -25,7 +25,7 @@ func TestDo(t *testing.T) {
 		return debian_config_builder.NewWithConfig(config)
 	}
 	copier := debian_copier.New()
-	package_creator := debian_package_creator.New(commandProvider, copier)
+	package_creator := debian_package_creator.New(commandProvider, copier, nil, nil)
 	config_parser := debian_config_parser.New()
 
 	err = do(writer, config_parser, configBuilderWithConfig, package_creator, "", "", "", "", "")

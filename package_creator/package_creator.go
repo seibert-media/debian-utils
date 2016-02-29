@@ -8,13 +8,18 @@ import (
 	"os/exec"
 	"strings"
 
-	command "github.com/bborbe/command"
+	"io"
+
+	"github.com/bborbe/command"
 	command_adapter "github.com/bborbe/command/adapter"
 	command_list "github.com/bborbe/command/list"
 	debian_config "github.com/bborbe/debian_utils/config"
 	debian_copier "github.com/bborbe/debian_utils/copier"
 	"github.com/bborbe/log"
 )
+
+type ExtractZipFile func(fileReader io.Reader, targetDir string) error
+type ExtractTarGz func(fileReader io.Reader, targetDir string) error
 
 type PackageCreator interface {
 	CreatePackage(config *debian_config.Config) error
@@ -23,6 +28,8 @@ type PackageCreator interface {
 type packageCreator struct {
 	commandListProvider CommandListProvider
 	copier              debian_copier.Copier
+	extractZipFile      ExtractZipFile
+	extractTarGz        ExtractTarGz
 }
 
 type builder struct {
@@ -30,16 +37,20 @@ type builder struct {
 	command_list     command_list.CommandList
 	copier           debian_copier.Copier
 	workingdirectory string
+	extractZipFile   ExtractZipFile
+	extractTarGz     ExtractTarGz
 }
 
 var logger = log.DefaultLogger
 
 type CommandListProvider func() command_list.CommandList
 
-func New(commandListProvider CommandListProvider, copier debian_copier.Copier) *packageCreator {
+func New(commandListProvider CommandListProvider, copier debian_copier.Copier, extractTarGz ExtractTarGz, extractZipFile ExtractZipFile) *packageCreator {
 	p := new(packageCreator)
 	p.commandListProvider = commandListProvider
 	p.copier = copier
+	p.extractZipFile = extractZipFile
+	p.extractTarGz = extractTarGz
 	return p
 }
 
@@ -48,6 +59,8 @@ func (p *packageCreator) CreatePackage(config *debian_config.Config) error {
 	b.command_list = p.commandListProvider()
 	b.copier = p.copier
 	b.config = config
+	b.extractTarGz = p.extractTarGz
+	b.extractZipFile = p.extractZipFile
 	logger.Debug("CreatePackage")
 	b.command_list.Add(b.validateCommand())
 	b.command_list.Add(b.createWorkingDirectoryCommand())
@@ -247,6 +260,28 @@ func (b *builder) copyFilesToWorkingDirectoryCommand() command.Command {
 			}
 			if err = createDirectory(directory); err != nil {
 				return err
+			}
+			logger.Debugf("%s extract = %v", file.Source, file.Extract)
+			if file.Extract {
+				if strings.HasSuffix(file.Source, ".zip") {
+					logger.Debugf("is zip => extract")
+					f, err := os.Open(file.Source)
+					if err != nil {
+						return err
+					}
+					defer f.Close()
+					return b.extractZipFile(f, filename)
+				}
+				if strings.HasSuffix(file.Source, ".tar.gz") || strings.HasSuffix(file.Source, ".tgz") {
+					logger.Debugf("is tar gz => extract")
+					f, err := os.Open(file.Source)
+					if err != nil {
+						return err
+					}
+					defer f.Close()
+					return b.extractTarGz(f, filename)
+				}
+				return fmt.Errorf("unkown file type")
 			}
 			if err = b.copier.Copy(file.Source, filename); err != nil {
 				return err
