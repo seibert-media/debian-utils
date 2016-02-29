@@ -46,23 +46,23 @@ func main() {
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	commandProvider := func() debian_command_list.CommandList {
+	commandListProvider := func() debian_command_list.CommandList {
 		return debian_command_list.New()
 	}
 	configBuilderWithConfig := func(config *debian_config.Config) debian_config_builder.ConfigBuilder {
 		return debian_config_builder.NewWithConfig(config)
 	}
+	config_parser := debian_config_parser.New()
 	copier := debian_copier.New()
 	zipExtractor := debian_zip_extractor.New()
 	tarGzExtractor := debian_tar_gz_extractor.New()
 	httpClientBuilder := http_client_builder.New().WithoutProxy()
 	httpClient := httpClientBuilder.Build()
 	requestbuilderProvider := http_requestbuilder.NewHttpRequestBuilderProvider()
-	package_creator := debian_package_creator.New(commandProvider, copier, tarGzExtractor.ExtractTarGz, zipExtractor.ExtractZip, httpClient.Do, requestbuilderProvider.NewHttpRequestBuilder)
-	config_parser := debian_config_parser.New()
+	debianPackageCreator := debian_package_creator.New(commandListProvider, copier, tarGzExtractor.ExtractTarGz, zipExtractor.ExtractZip, httpClient.Do, requestbuilderProvider.NewHttpRequestBuilder)
 
 	writer := os.Stdout
-	err := do(writer, config_parser, configBuilderWithConfig, package_creator, *configPtr, *namePtr, *versionPtr, *sourcePtr, *targetPtr)
+	err := do(writer, config_parser, configBuilderWithConfig, debianPackageCreator, *configPtr, *namePtr, *versionPtr, *sourcePtr, *targetPtr)
 	if err != nil {
 		logger.Fatal(err)
 		logger.Close()
