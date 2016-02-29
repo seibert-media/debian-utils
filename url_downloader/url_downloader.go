@@ -37,7 +37,7 @@ func (u *urlDownloader) DownloadUrl(url string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	if resp.StatusCode / 100 != 2 {
+	if resp.StatusCode/100 != 2 {
 		return "", fmt.Errorf("get url failed: %s", url)
 	}
 	content, err := ioutil.ReadAll(resp.Body)

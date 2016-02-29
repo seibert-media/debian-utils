@@ -10,14 +10,15 @@ import (
 
 	"io"
 
+	"net/http"
+
 	"github.com/bborbe/command"
 	command_adapter "github.com/bborbe/command/adapter"
 	command_list "github.com/bborbe/command/list"
 	debian_config "github.com/bborbe/debian_utils/config"
 	debian_copier "github.com/bborbe/debian_utils/copier"
-	"github.com/bborbe/log"
-	"net/http"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
+	"github.com/bborbe/log"
 )
 
 type ExtractZipFile func(fileReader io.Reader, targetDir string) error
@@ -303,7 +304,7 @@ func (b *builder) copyFilesToWorkingDirectoryCommand() command.Command {
 				}
 				defer f.Close()
 				var perm os.FileMode = 0644
-				w, err := os.OpenFile(filename, os.O_WRONLY | os.O_CREATE | os.O_TRUNC, perm)
+				w, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, perm)
 				if err != nil {
 					return err
 				}
@@ -337,7 +338,7 @@ func (b *builder) fileToReader(path string) (io.ReadCloser, error) {
 		if err != nil {
 			return nil, err
 		}
-		if resp.StatusCode / 100 != 2 {
+		if resp.StatusCode/100 != 2 {
 			return nil, fmt.Errorf("get url failed: %s", path)
 		}
 		return resp.Body, nil
@@ -366,7 +367,7 @@ func createDirectory(directory string) error {
 func dirOf(filename string) (string, error) {
 	pos := strings.LastIndex(filename, "/")
 	if pos != -1 {
-		return filename[:pos + 1], nil
+		return filename[:pos+1], nil
 	}
 	return "", fmt.Errorf("can't determine directory of file %s", filename)
 }
