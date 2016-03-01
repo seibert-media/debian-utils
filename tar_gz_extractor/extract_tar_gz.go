@@ -25,13 +25,13 @@ func New() *tarGzExtractor {
 var logger = log.DefaultLogger
 
 func (e *tarGzExtractor) ExtractTarGz(fileReader io.Reader, targetDir string) error {
-	logger.Debugf("extract tar fz")
+	logger.Debugf("extract tar fz to %s", targetDir)
 
 	gw, err := gzip.NewReader(fileReader)
-	defer gw.Close()
 	if err != nil {
 		return err
 	}
+	defer gw.Close()
 
 	tr := tar.NewReader(gw)
 	for {
@@ -71,7 +71,7 @@ func extractFile(path string, mode os.FileMode, tr io.Reader) error {
 			return err
 		}
 	}
-	ow, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, mode)
+	ow, err := os.OpenFile(path, os.O_RDWR | os.O_CREATE | os.O_TRUNC, mode)
 	defer ow.Close()
 	if err != nil {
 		logger.Debugf("open file failed: %s %v", path, mode)
