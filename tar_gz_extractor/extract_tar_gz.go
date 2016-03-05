@@ -71,7 +71,7 @@ func extractFile(path string, mode os.FileMode, tr io.Reader) error {
 			return err
 		}
 	}
-	ow, err := os.OpenFile(path, os.O_RDWR | os.O_CREATE | os.O_TRUNC, mode)
+	ow, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, mode)
 	defer ow.Close()
 	if err != nil {
 		logger.Debugf("open file failed: %s %v", path, mode)
