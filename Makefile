@@ -4,7 +4,7 @@ install:
 	GOBIN=$(GOPATH)/bin GO15VENDOREXPERIMENT=1 go install bin/update_apt_source_list/update_apt_source_list.go
 	GOBIN=$(GOPATH)/bin GO15VENDOREXPERIMENT=1 go install bin/update_available_apt_source_list/update_available_apt_source_list.go
 test:
-	GO15VENDOREXPERIMENT=1 go test `glide novendor`
+	GO15VENDOREXPERIMENT=1 go test -cover `glide novendor`
 vet:
 	go tool vet .
 	go tool vet --shadow .
