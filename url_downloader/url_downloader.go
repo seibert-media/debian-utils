@@ -9,25 +9,25 @@ import (
 )
 
 type ExecuteRequest func(req *http.Request) (resp *http.Response, err error)
-type HttpRequestBuilderProvider func(url string) http_requestbuilder.HttpRequestBuilder
+type HTTPRequestBuilderProvider func(url string) http_requestbuilder.HttpRequestBuilder
 
-type UrlDownloader interface {
-	DownloadUrl(url string) (string, error)
+type URLDownloader interface {
+	DownloadURL(url string) (string, error)
 }
 
 type urlDownloader struct {
-	httpRequestBuilderProvider HttpRequestBuilderProvider
+	httpRequestBuilderProvider HTTPRequestBuilderProvider
 	executeRequest             ExecuteRequest
 }
 
-func New(executeRequest ExecuteRequest, httpRequestBuilderProvider HttpRequestBuilderProvider) *urlDownloader {
+func New(executeRequest ExecuteRequest, httpRequestBuilderProvider HTTPRequestBuilderProvider) *urlDownloader {
 	u := new(urlDownloader)
 	u.httpRequestBuilderProvider = httpRequestBuilderProvider
 	u.executeRequest = executeRequest
 	return u
 }
 
-func (u *urlDownloader) DownloadUrl(url string) (string, error) {
+func (u *urlDownloader) DownloadURL(url string) (string, error) {
 	rb := u.httpRequestBuilderProvider(url)
 	req, err := rb.Build()
 	if err != nil {

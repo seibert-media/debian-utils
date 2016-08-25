@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"io"
 	"os"
 	"runtime"
 
@@ -18,14 +17,14 @@ import (
 var logger = log.DefaultLogger
 
 const (
-	PARAMETER_LOGLEVEL = "loglevel"
-	PARAMETER_PATH     = "path"
+	parameterLoglevel = "loglevel"
+	parameterPath     = "path"
 )
 
 func main() {
 	defer logger.Close()
-	logLevelPtr := flag.String(PARAMETER_LOGLEVEL, log.INFO_STRING, log.FLAG_USAGE)
-	pathPtr := flag.String(PARAMETER_PATH, "", "path")
+	logLevelPtr := flag.String(parameterLoglevel, log.INFO_STRING, log.FLAG_USAGE)
+	pathPtr := flag.String(parameterPath, "", "path")
 	flag.Parse()
 	logger.SetLevelThreshold(log.LogStringToLevel(*logLevelPtr))
 	logger.Debugf("set log level to %s", *logLevelPtr)
@@ -34,13 +33,12 @@ func main() {
 
 	httpClientBuilder := http_client_builder.New().WithoutProxy()
 	httpClient := httpClientBuilder.Build()
-	requestbuilderProvider := http_requestbuilder.NewHttpRequestBuilderProvider()
-	downloader := debian_url_downloader.New(httpClient.Do, requestbuilderProvider.NewHttpRequestBuilder)
-	lineInspector := debian_line_inspector.New(downloader.DownloadUrl)
+	requestbuilderProvider := http_requestbuilder.NewHTTPRequestBuilderProvider()
+	downloader := debian_url_downloader.New(httpClient.Do, requestbuilderProvider.NewHTTPRequestBuilder)
+	lineInspector := debian_line_inspector.New(downloader.DownloadURL)
 	hasChanged := debian_apt_source_has_changed.New(lineInspector.HasLineChanged)
 
-	writer := os.Stdout
-	bool, err := do(writer, hasChanged, *pathPtr)
+	bool, err := do(hasChanged, *pathPtr)
 	if err != nil {
 		logger.Fatal(err)
 		logger.Close()
@@ -55,7 +53,7 @@ func main() {
 	}
 }
 
-func do(writer io.Writer, hasChanged debian_apt_source_has_changed.AptSourceHasChanged, path string) (bool, error) {
+func do(hasChanged debian_apt_source_has_changed.AptSourceHasChanged, path string) (bool, error) {
 	logger.Debugf("update repos in apt source list: %s", path)
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		return false, err

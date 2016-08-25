@@ -2,15 +2,11 @@
 
 Package provide some debian utils
 
-## Install
+## Create Debian Package
+
+create_debian_package create a Debian-Package with instructions out of a Json config.  
 
 `go get github.com/bborbe/debian_utils/bin/create_debian_package`
-
-`go get github.com/bborbe/debian_utils/bin/extract_zip`
-
-`go get github.com/bborbe/debian_utils/bin/update_apt_source_list`
-
-## Create Debian Package
 
 ```
 create_debian_package \
@@ -48,11 +44,27 @@ create_debian_package \
 
 ## Update Apt-Repo
 
+update_available_apt_source_list checks if a debian repo has changed and update_apt_source_list fetches the new sources.
+
+`go get github.com/bborbe/debian_utils/bin/update_available_apt_source_list`
+
+`go get github.com/bborbe/debian_utils/bin/update_apt_source_list`
+
+```
+update_available_apt_source_list \
+-loglevel=DEBUG \
+-path /etc/apt/sources.list.d/aptly-unstable.benjamin-borbe.de.list
+```
+
 ```
 update_apt_source_list \
 -loglevel=DEBUG \
 -path /etc/apt/sources.list.d/aptly-unstable.benjamin-borbe.de.list
 ```
+
+## Extract Zip
+
+`go get github.com/bborbe/debian_utils/bin/extract_zip`
 
 ## Continuous integration
 

@@ -18,14 +18,14 @@ type LineInspector interface {
 }
 
 type lineInspector struct {
-	downloadUrl DownloadUrl
+	downloadURL DownloadURL
 }
 
-type DownloadUrl func(url string) (string, error)
+type DownloadURL func(url string) (string, error)
 
-func New(downloadUrl DownloadUrl) *lineInspector {
+func New(downloadURL DownloadURL) *lineInspector {
 	a := new(lineInspector)
-	a.downloadUrl = downloadUrl
+	a.downloadURL = downloadURL
 	return a
 }
 
@@ -34,7 +34,7 @@ func (a *lineInspector) HasLineChanged(line string) (bool, error) {
 	if strings.Index(line, "deb ") != 0 {
 		return false, nil
 	}
-	infos, err := ParseLine(line)
+	infos, err := parseLine(line)
 	if err != nil {
 		return false, err
 	}
@@ -48,7 +48,7 @@ type infos struct {
 	component    string
 }
 
-func ParseLine(line string) (*infos, error) {
+func parseLine(line string) (*infos, error) {
 	logger.Debugf("parse line %s", line)
 	i := new(infos)
 	{
@@ -87,9 +87,9 @@ func ParseLine(line string) (*infos, error) {
 }
 
 func (a *lineInspector) compareLocalAndRemotePackage(infos *infos) (bool, error) {
-	remotePackagesUrl := infos.RemotePackagesUrl()
-	logger.Debugf("remote packages url: %s", remotePackagesUrl)
-	remotePackagesContent, err := a.downloadUrl(remotePackagesUrl)
+	remotePackagesURL := infos.RemotePackagesURL()
+	logger.Debugf("remote packages url: %s", remotePackagesURL)
+	remotePackagesContent, err := a.downloadURL(remotePackagesURL)
 	if err != nil {
 		logger.Debugf("fetch remote package failed => return false")
 		return false, err
@@ -108,7 +108,7 @@ func (a *lineInspector) compareLocalAndRemotePackage(infos *infos) (bool, error)
 	return result, nil
 }
 
-func (i *infos) RemotePackagesUrl() string {
+func (i *infos) RemotePackagesURL() string {
 	return fmt.Sprintf("%s/dists/%s/%s/binary-%s/Packages", i.url, i.distribution, i.component, i.architecture)
 }
 

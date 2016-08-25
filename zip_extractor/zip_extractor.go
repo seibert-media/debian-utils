@@ -27,7 +27,11 @@ func (e *zipExtractor) ExtractZip(fileReader io.Reader, targetDir string) error 
 	logger.Debugf("extract zip")
 
 	filename := "/tmp/test.zip"
-	defer os.Remove(filename)
+	defer func() {
+		if err := os.Remove(filename); err != nil {
+			logger.Warnf("remove file %v failed: %v", filename, err)
+		}
+	}()
 	err := write(fileReader, filename)
 	if err != nil {
 		return err
@@ -45,7 +49,9 @@ func (e *zipExtractor) ExtractZipFile(filename string, targetDir string) error {
 		path := fmt.Sprintf("%s/%s", targetDir, f.Name)
 		if f.FileInfo().IsDir() {
 			logger.Debugf("extract dir %s", f.Name)
-			mkdir(path, f.FileInfo().Mode())
+			if err := mkdir(path, f.FileInfo().Mode()); err != nil {
+				return err
+			}
 		} else {
 			logger.Debugf("extract file %s", f.Name)
 			reader, err := f.Open()

@@ -3,8 +3,6 @@ package main
 import (
 	"testing"
 
-	"bytes"
-
 	. "github.com/bborbe/assert"
 	debian_command_list "github.com/bborbe/command/list"
 	debian_config "github.com/bborbe/debian_utils/config"
@@ -16,7 +14,6 @@ import (
 
 func TestDo(t *testing.T) {
 	var err error
-	writer := bytes.NewBufferString("")
 
 	commandProvider := func() debian_command_list.CommandList {
 		return debian_command_list.New()
@@ -28,9 +25,8 @@ func TestDo(t *testing.T) {
 	package_creator := debian_package_creator.New(commandProvider, copier, nil, nil, nil, nil)
 	config_parser := debian_config_parser.New()
 
-	err = do(writer, config_parser, configBuilderWithConfig, package_creator, "", "", "", "", "")
-	err = AssertThat(err, NotNilValue())
-	if err != nil {
+	err = do(config_parser, configBuilderWithConfig, package_creator, "", "", "", "", "")
+	if err := AssertThat(err, NotNilValue()); err != nil {
 		t.Fatal(err)
 	}
 }

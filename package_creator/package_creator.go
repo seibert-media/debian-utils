@@ -24,7 +24,7 @@ import (
 type ExtractZipFile func(fileReader io.Reader, targetDir string) error
 type ExtractTarGz func(fileReader io.Reader, targetDir string) error
 type ExecuteRequest func(req *http.Request) (resp *http.Response, err error)
-type HttpRequestBuilderProvider func(url string) http_requestbuilder.HttpRequestBuilder
+type HTTPRequestBuilderProvider func(url string) http_requestbuilder.HttpRequestBuilder
 
 type PackageCreator interface {
 	CreatePackage(config *debian_config.Config) error
@@ -36,7 +36,7 @@ type packageCreator struct {
 	extractZipFile             ExtractZipFile
 	extractTarGz               ExtractTarGz
 	executeRequest             ExecuteRequest
-	httpRequestBuilderProvider HttpRequestBuilderProvider
+	httpRequestBuilderProvider HTTPRequestBuilderProvider
 }
 
 type builder struct {
@@ -47,14 +47,14 @@ type builder struct {
 	extractZipFile             ExtractZipFile
 	extractTarGz               ExtractTarGz
 	executeRequest             ExecuteRequest
-	httpRequestBuilderProvider HttpRequestBuilderProvider
+	httpRequestBuilderProvider HTTPRequestBuilderProvider
 }
 
 var logger = log.DefaultLogger
 
 type CommandListProvider func() command_list.CommandList
 
-func New(commandListProvider CommandListProvider, copier debian_copier.Copier, extractTarGz ExtractTarGz, extractZipFile ExtractZipFile, executeRequest ExecuteRequest, httpRequestBuilderProvider HttpRequestBuilderProvider) *packageCreator {
+func New(commandListProvider CommandListProvider, copier debian_copier.Copier, extractTarGz ExtractTarGz, extractZipFile ExtractZipFile, executeRequest ExecuteRequest, httpRequestBuilderProvider HTTPRequestBuilderProvider) *packageCreator {
 	p := new(packageCreator)
 	p.commandListProvider = commandListProvider
 	p.copier = copier
@@ -296,7 +296,7 @@ func (b *builder) copyFilesToWorkingDirectoryCommand() command.Command {
 				}
 				return fmt.Errorf("unkown file type")
 			}
-			if isUrl(file.Source) {
+			if isURL(file.Source) {
 				logger.Debugf("%s is url", file.Source)
 				f, err := b.fileToReader(file.Source)
 				if err != nil {
@@ -323,12 +323,12 @@ func (b *builder) copyFilesToWorkingDirectoryCommand() command.Command {
 		return nil
 	})
 }
-func isUrl(path string) bool {
+func isURL(path string) bool {
 	return strings.HasPrefix(path, "https://") || strings.HasPrefix(path, "http://")
 }
 
 func (b *builder) fileToReader(path string) (io.ReadCloser, error) {
-	if isUrl(path) {
+	if isURL(path) {
 		rb := b.httpRequestBuilderProvider(path)
 		req, err := rb.Build()
 		if err != nil {

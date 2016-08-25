@@ -6,9 +6,9 @@ import (
 	. "github.com/bborbe/assert"
 )
 
-func TestImplementsUrlDownloader(t *testing.T) {
+func TestImplementsURLDownloader(t *testing.T) {
 	b := New(nil, nil)
-	var i *UrlDownloader
+	var i *URLDownloader
 	err := AssertThat(b, Implements(i).Message("check type"))
 	if err != nil {
 		t.Fatal(err)

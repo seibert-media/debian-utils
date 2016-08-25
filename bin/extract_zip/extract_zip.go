@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"io"
 	"os"
 	"runtime"
 
@@ -15,18 +14,18 @@ import (
 var logger = log.DefaultLogger
 
 const (
-	PARAMETER_LOGLEVEL = "loglevel"
-	PARAMETER_ZIP      = "zip"
-	PARAMETER_TARGET   = "target"
+	parameterLoglevel = "loglevel"
+	parameterZip      = "zip"
+	parameterTarget   = "target"
 )
 
 type ExtractZipFile func(filename string, targetDir string) error
 
 func main() {
 	defer logger.Close()
-	logLevelPtr := flag.String(PARAMETER_LOGLEVEL, log.INFO_STRING, log.FLAG_USAGE)
-	zipPtr := flag.String(PARAMETER_ZIP, "", "zip")
-	targetPtr := flag.String(PARAMETER_TARGET, "", "target")
+	logLevelPtr := flag.String(parameterLoglevel, log.INFO_STRING, log.FLAG_USAGE)
+	zipPtr := flag.String(parameterZip, "", "zip")
+	targetPtr := flag.String(parameterTarget, "", "target")
 	flag.Parse()
 	logger.SetLevelThreshold(log.LogStringToLevel(*logLevelPtr))
 	logger.Debugf("set log level to %s", *logLevelPtr)
@@ -35,8 +34,7 @@ func main() {
 
 	z := zip_extractor.New()
 
-	writer := os.Stdout
-	err := do(writer, z.ExtractZipFile, *zipPtr, *targetPtr)
+	err := do(z.ExtractZipFile, *zipPtr, *targetPtr)
 	if err != nil {
 		logger.Fatal(err)
 		logger.Close()
@@ -44,12 +42,12 @@ func main() {
 	}
 }
 
-func do(writer io.Writer, extractZipFile ExtractZipFile, zip string, target string) error {
+func do(extractZipFile ExtractZipFile, zip string, target string) error {
 	if len(zip) == 0 {
-		return fmt.Errorf("parameter %s missing", PARAMETER_ZIP)
+		return fmt.Errorf("parameter %s missing", parameterZip)
 	}
 	if len(target) == 0 {
-		return fmt.Errorf("parameter %s missing", PARAMETER_TARGET)
+		return fmt.Errorf("parameter %s missing", parameterTarget)
 	}
 	return extractZipFile(zip, target)
 }

@@ -83,15 +83,21 @@ func (b *builder) createWorkingDirectoryCommand() command.Command {
 func (b *builder) extractCommand() command.Command {
 	return command_adapter.New(func() error {
 		return b.extractFile(b.fileReader, b.workingdirectory)
-	}, func() error { return nil })
+	}, func() error {
+		return nil
+	})
 }
 
 func (b *builder) createDebianPackageCommand() command.Command {
 	return command_adapter.New(func() error {
 		configBuilder := debian_config_builder.NewWithConfig(b.config)
-		configBuilder.AddFile(joinDirs(b.workingdirectory, b.sourceDir), b.targetDir)
+		if err := configBuilder.AddFile(joinDirs(b.workingdirectory, b.sourceDir), b.targetDir); err != nil {
+			return err
+		}
 		return b.packageCreator.CreatePackage(configBuilder.Build())
-	}, func() error { return nil })
+	}, func() error {
+		return nil
+	})
 }
 
 func (b *builder) removeWorkingDirectoryCommand() command.Command {

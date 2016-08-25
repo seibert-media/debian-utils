@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"io"
 	"os"
 	"runtime"
 
@@ -22,24 +21,24 @@ import (
 var logger = log.DefaultLogger
 
 const (
-	PARAMETER_NAME     = "name"
-	PARAMETER_VERSION  = "version"
-	PARAMETER_SOURCE   = "source"
-	PARAMETER_TARGET   = "target"
-	PARAMETER_LOGLEVEL = "loglevel"
-	PARAMETER_CONFIG   = "config"
+	paramterName     = "name"
+	paramterVersion  = "version"
+	paramterSource   = "source"
+	paramterTarget   = "target"
+	paramterLoglevel = "loglevel"
+	paramterConfig   = "config"
 )
 
 type ConfigBuilderWithConfig func(config *debian_config.Config) debian_config_builder.ConfigBuilder
 
 func main() {
 	defer logger.Close()
-	logLevelPtr := flag.String(PARAMETER_LOGLEVEL, log.INFO_STRING, log.FLAG_USAGE)
-	configPtr := flag.String(PARAMETER_CONFIG, "", "config")
-	namePtr := flag.String(PARAMETER_NAME, "", "name")
-	versionPtr := flag.String(PARAMETER_VERSION, "", "version")
-	sourcePtr := flag.String(PARAMETER_SOURCE, "", "source")
-	targetPtr := flag.String(PARAMETER_TARGET, "", "target")
+	logLevelPtr := flag.String(paramterLoglevel, log.INFO_STRING, log.FLAG_USAGE)
+	configPtr := flag.String(paramterConfig, "", "config")
+	namePtr := flag.String(paramterName, "", "name")
+	versionPtr := flag.String(paramterVersion, "", "version")
+	sourcePtr := flag.String(paramterSource, "", "source")
+	targetPtr := flag.String(paramterTarget, "", "target")
 	flag.Parse()
 	logger.SetLevelThreshold(log.LogStringToLevel(*logLevelPtr))
 	logger.Debugf("set log level to %s", *logLevelPtr)
@@ -58,11 +57,10 @@ func main() {
 	tarGzExtractor := debian_tar_gz_extractor.New()
 	httpClientBuilder := http_client_builder.New().WithoutProxy()
 	httpClient := httpClientBuilder.Build()
-	requestbuilderProvider := http_requestbuilder.NewHttpRequestBuilderProvider()
-	debianPackageCreator := debian_package_creator.New(commandListProvider, copier, tarGzExtractor.ExtractTarGz, zipExtractor.ExtractZip, httpClient.Do, requestbuilderProvider.NewHttpRequestBuilder)
+	requestbuilderProvider := http_requestbuilder.NewHTTPRequestBuilderProvider()
+	debianPackageCreator := debian_package_creator.New(commandListProvider, copier, tarGzExtractor.ExtractTarGz, zipExtractor.ExtractZip, httpClient.Do, requestbuilderProvider.NewHTTPRequestBuilder)
 
-	writer := os.Stdout
-	err := do(writer, config_parser, configBuilderWithConfig, debianPackageCreator, *configPtr, *namePtr, *versionPtr, *sourcePtr, *targetPtr)
+	err := do(config_parser, configBuilderWithConfig, debianPackageCreator, *configPtr, *namePtr, *versionPtr, *sourcePtr, *targetPtr)
 	if err != nil {
 		logger.Fatal(err)
 		logger.Close()
@@ -70,7 +68,7 @@ func main() {
 	}
 }
 
-func do(writer io.Writer,
+func do(
 	config_parser debian_config_parser.ConfigParser,
 	configBuilderWithConfig ConfigBuilderWithConfig,
 	package_creator debian_package_creator.PackageCreator,
@@ -87,8 +85,14 @@ func do(writer io.Writer,
 		}
 	}
 	config_builder := configBuilderWithConfig(config)
-	config_builder.AddFile(source, target)
-	config_builder.Name(name)
-	config_builder.Version(version)
+	if err := config_builder.AddFile(source, target); err != nil {
+		return err
+	}
+	if err := config_builder.Name(name); err != nil {
+		return err
+	}
+	if err := config_builder.Version(version); err != nil {
+		return err
+	}
 	return package_creator.CreatePackage(config_builder.Build())
 }
