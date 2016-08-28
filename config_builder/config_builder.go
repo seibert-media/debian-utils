@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	debian_config "github.com/bborbe/debian_utils/config"
-	"github.com/bborbe/log"
+	"github.com/golang/glog"
 )
 
 type ConfigBuilder interface {
@@ -19,8 +19,6 @@ type ConfigBuilder interface {
 	AddDepend(depend string) error
 	Build() *debian_config.Config
 }
-
-var logger = log.DefaultLogger
 
 type configBuilder struct {
 	config *debian_config.Config
@@ -37,7 +35,7 @@ func NewWithConfig(config *debian_config.Config) *configBuilder {
 }
 
 func (c *configBuilder) Section(section string) error {
-	logger.Debugf("Section %s", section)
+	glog.V(2).Infof("Section %s", section)
 	if len(section) == 0 {
 		return fmt.Errorf("section empty")
 	}
@@ -46,7 +44,7 @@ func (c *configBuilder) Section(section string) error {
 }
 
 func (c *configBuilder) Priority(priority string) error {
-	logger.Debugf("Priority %s", priority)
+	glog.V(2).Infof("Priority %s", priority)
 	if len(priority) == 0 {
 		return fmt.Errorf("priority empty")
 	}
@@ -55,7 +53,7 @@ func (c *configBuilder) Priority(priority string) error {
 }
 
 func (c *configBuilder) Architecture(architecture string) error {
-	logger.Debugf("Architecture %s", architecture)
+	glog.V(2).Infof("Architecture %s", architecture)
 	if len(architecture) == 0 {
 		return fmt.Errorf("architecture empty")
 	}
@@ -64,7 +62,7 @@ func (c *configBuilder) Architecture(architecture string) error {
 }
 
 func (c *configBuilder) Maintainer(maintainer string) error {
-	logger.Debugf("Maintainer %s", maintainer)
+	glog.V(2).Infof("Maintainer %s", maintainer)
 	if len(maintainer) == 0 {
 		return fmt.Errorf("maintainer empty")
 	}
@@ -73,7 +71,7 @@ func (c *configBuilder) Maintainer(maintainer string) error {
 }
 
 func (c *configBuilder) Description(description string) error {
-	logger.Debugf("Description %s", description)
+	glog.V(2).Infof("Description %s", description)
 	if len(description) == 0 {
 		return fmt.Errorf("description empty")
 	}
@@ -82,7 +80,7 @@ func (c *configBuilder) Description(description string) error {
 }
 
 func (c *configBuilder) Name(name string) error {
-	logger.Debugf("Name %s", name)
+	glog.V(2).Infof("Name %s", name)
 	if len(name) == 0 {
 		return fmt.Errorf("name empty")
 	}
@@ -91,7 +89,7 @@ func (c *configBuilder) Name(name string) error {
 }
 
 func (c *configBuilder) Version(version string) error {
-	logger.Debugf("Version %s", version)
+	glog.V(2).Infof("Version %s", version)
 	if len(version) == 0 {
 		return fmt.Errorf("version empty")
 	}

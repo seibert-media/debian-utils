@@ -12,14 +12,12 @@ import (
 	debian_config "github.com/bborbe/debian_utils/config"
 	debian_config_builder "github.com/bborbe/debian_utils/config_builder"
 	debian_package_creator "github.com/bborbe/debian_utils/package_creator"
-	"github.com/bborbe/log"
+	"github.com/golang/glog"
 )
 
 type Creator interface {
 	CreatePackage(fileReader io.Reader, config *debian_config.Config, sourceDir string, targetDir string) error
 }
-
-var logger = log.DefaultLogger
 
 type CommandListProvider func() command_list.CommandList
 type ExtractFile func(fileReader io.Reader, targetDir string) error
@@ -68,12 +66,12 @@ type builder struct {
 
 func (b *builder) createWorkingDirectoryCommand() command.Command {
 	return command_adapter.New(func() error {
-		logger.Debugf("create working directory")
+		glog.V(2).Infof("create working directory")
 		var err error
 		if b.workingdirectory, err = ioutil.TempDir("", "create-debian-package"); err != nil {
 			return err
 		}
-		logger.Debugf("working directory %s create", b.workingdirectory)
+		glog.V(2).Infof("working directory %s create", b.workingdirectory)
 		return nil
 	}, func() error {
 		return os.RemoveAll(b.workingdirectory)
@@ -102,11 +100,11 @@ func (b *builder) createDebianPackageCommand() command.Command {
 
 func (b *builder) removeWorkingDirectoryCommand() command.Command {
 	return command_adapter.New(func() error {
-		logger.Debugf("clean working directory %s", b.workingdirectory)
+		glog.V(2).Infof("clean working directory %s", b.workingdirectory)
 		if err := os.RemoveAll(b.workingdirectory); err != nil {
 			return err
 		}
-		logger.Debugf("working directory %s cleaned", b.workingdirectory)
+		glog.V(2).Infof("working directory %s cleaned", b.workingdirectory)
 		return nil
 	}, func() error {
 		return nil

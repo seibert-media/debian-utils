@@ -18,7 +18,7 @@ import (
 	debian_config "github.com/bborbe/debian_utils/config"
 	debian_copier "github.com/bborbe/debian_utils/copier"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
-	"github.com/bborbe/log"
+	"github.com/golang/glog"
 )
 
 type ExtractZipFile func(fileReader io.Reader, targetDir string) error
@@ -50,8 +50,6 @@ type builder struct {
 	httpRequestBuilderProvider HTTPRequestBuilderProvider
 }
 
-var logger = log.DefaultLogger
-
 type CommandListProvider func() command_list.CommandList
 
 func New(commandListProvider CommandListProvider, copier debian_copier.Copier, extractTarGz ExtractTarGz, extractZipFile ExtractZipFile, executeRequest ExecuteRequest, httpRequestBuilderProvider HTTPRequestBuilderProvider) *packageCreator {
@@ -74,7 +72,7 @@ func (p *packageCreator) CreatePackage(config *debian_config.Config) error {
 	b.extractZipFile = p.extractZipFile
 	b.executeRequest = p.executeRequest
 	b.httpRequestBuilderProvider = p.httpRequestBuilderProvider
-	logger.Debug("CreatePackage")
+	glog.V(2).Info("CreatePackage")
 	b.command_list.Add(b.validateCommand())
 	b.command_list.Add(b.createWorkingDirectoryCommand())
 	b.command_list.Add(b.createDebianFolderCommand())
@@ -90,7 +88,7 @@ func (p *packageCreator) CreatePackage(config *debian_config.Config) error {
 
 func (b *builder) validateCommand() command.Command {
 	return command_adapter.New(func() error {
-		logger.Debug("validate")
+		glog.V(2).Info("validate")
 		if len(b.config.Files) == 0 {
 			return fmt.Errorf("add at least one file")
 		}
@@ -100,7 +98,7 @@ func (b *builder) validateCommand() command.Command {
 		if len(b.config.Version) == 0 {
 			return fmt.Errorf("version missing")
 		}
-		logger.Debug("validate success")
+		glog.V(2).Info("validate success")
 		return nil
 	}, func() error {
 		return nil
@@ -109,12 +107,12 @@ func (b *builder) validateCommand() command.Command {
 
 func (b *builder) createWorkingDirectoryCommand() command.Command {
 	return command_adapter.New(func() error {
-		logger.Debugf("create working directory")
+		glog.V(2).Infof("create working directory")
 		var err error
 		if b.workingdirectory, err = ioutil.TempDir("", fmt.Sprintf("%s_%s", b.config.Name, b.config.Version)); err != nil {
 			return err
 		}
-		logger.Debugf("working directory %s create", b.workingdirectory)
+		glog.V(2).Infof("working directory %s create", b.workingdirectory)
 		return nil
 	}, func() error {
 		return os.RemoveAll(b.workingdirectory)
@@ -123,7 +121,7 @@ func (b *builder) createWorkingDirectoryCommand() command.Command {
 
 func (b *builder) createDebianCopyPrePostFilesCommand() command.Command {
 	return command_adapter.New(func() error {
-		logger.Debugf("copy pre post inst rm files")
+		glog.V(2).Infof("copy pre post inst rm files")
 		var err error
 		path := fmt.Sprintf("%s/%s_%s/DEBIAN", b.workingdirectory, b.config.Name, b.config.Version)
 		if len(b.config.Postinst) > 0 {
@@ -146,7 +144,7 @@ func (b *builder) createDebianCopyPrePostFilesCommand() command.Command {
 				return err
 			}
 		}
-		logger.Debugf("pre post inst rm files copied")
+		glog.V(2).Infof("pre post inst rm files copied")
 		return nil
 	}, func() error {
 		return nil
@@ -156,11 +154,11 @@ func (b *builder) createDebianCopyPrePostFilesCommand() command.Command {
 func (b *builder) createDebianFolderCommand() command.Command {
 	return command_adapter.New(func() error {
 		path := fmt.Sprintf("%s/%s_%s/DEBIAN", b.workingdirectory, b.config.Name, b.config.Version)
-		logger.Debugf("create debian folder %s", path)
+		glog.V(2).Infof("create debian folder %s", path)
 		if err := createDirectory(path); err != nil {
 			return err
 		}
-		logger.Debugf("debian folder created")
+		glog.V(2).Infof("debian folder created")
 		return nil
 	}, func() error {
 		return nil
@@ -169,11 +167,11 @@ func (b *builder) createDebianFolderCommand() command.Command {
 
 func (b *builder) createDebianControlCommand() command.Command {
 	return command_adapter.New(func() error {
-		logger.Debugf("write debian control")
+		glog.V(2).Infof("write debian control")
 		if err := ioutil.WriteFile(fmt.Sprintf("%s/%s_%s/DEBIAN/control", b.workingdirectory, b.config.Name, b.config.Version), controlContent(*b.config), 0644); err != nil {
 			return err
 		}
-		logger.Debugf("debian control written")
+		glog.V(2).Infof("debian control written")
 		return nil
 	}, func() error {
 		return nil
@@ -197,15 +195,15 @@ func controlContent(config debian_config.Config) []byte {
 
 func (b *builder) createDebianConffilesCommand() command.Command {
 	return command_adapter.New(func() error {
-		logger.Debugf("write debian conffiles")
+		glog.V(2).Infof("write debian conffiles")
 		content := conffilesContent(b.config.Files)
 		if len(content) > 0 {
 			if err := ioutil.WriteFile(fmt.Sprintf("%s/%s_%s/DEBIAN/conffiles", b.workingdirectory, b.config.Name, b.config.Version), content, 0644); err != nil {
 				return err
 			}
-			logger.Debugf("debian conffiles written")
+			glog.V(2).Infof("debian conffiles written")
 		} else {
-			logger.Debugf("no found files, skip writing")
+			glog.V(2).Infof("no found files, skip writing")
 		}
 		return nil
 	}, func() error {
@@ -225,7 +223,7 @@ func conffilesContent(files []debian_config.File) []byte {
 
 func (b *builder) createDebianPackageCommand() command.Command {
 	return command_adapter.New(func() error {
-		logger.Debugf("create debian package")
+		glog.V(2).Infof("create debian package")
 		cmd := exec.Command("dpkg-deb", "-Zgzip", "--build", fmt.Sprintf("%s_%s", b.config.Name, b.config.Version))
 		cmd.Dir = b.workingdirectory
 		cmd.Stderr = os.Stderr
@@ -233,7 +231,7 @@ func (b *builder) createDebianPackageCommand() command.Command {
 		if err := cmd.Run(); err != nil {
 			return err
 		}
-		logger.Debugf("debian package created")
+		glog.V(2).Infof("debian package created")
 		return nil
 	}, func() error {
 		return nil
@@ -242,7 +240,7 @@ func (b *builder) createDebianPackageCommand() command.Command {
 
 func (b *builder) copyDebianPackageCommand() command.Command {
 	return command_adapter.New(func() error {
-		logger.Debugf("copy debian package")
+		glog.V(2).Infof("copy debian package")
 		var dir string
 		var err error
 		if dir, err = os.Getwd(); err != nil {
@@ -253,7 +251,7 @@ func (b *builder) copyDebianPackageCommand() command.Command {
 		if err = b.copier.Copy(source, target); err != nil {
 			return err
 		}
-		logger.Debugf("debian package copied")
+		glog.V(2).Infof("debian package copied")
 		return nil
 	}, func() error {
 		return nil
@@ -262,7 +260,7 @@ func (b *builder) copyDebianPackageCommand() command.Command {
 
 func (b *builder) copyFilesToWorkingDirectoryCommand() command.Command {
 	return command_adapter.New(func() error {
-		logger.Debugf("copy files")
+		glog.V(2).Infof("copy files")
 		for _, file := range b.config.Files {
 			var err error
 			var directory string
@@ -274,10 +272,10 @@ func (b *builder) copyFilesToWorkingDirectoryCommand() command.Command {
 			if err = createDirectory(directory); err != nil {
 				return err
 			}
-			logger.Debugf("%s extract = %v", file.Source, file.Extract)
+			glog.V(2).Infof("%s extract = %v", file.Source, file.Extract)
 			if file.Extract {
 				if strings.HasSuffix(file.Source, ".zip") {
-					logger.Debugf("is zip => extract")
+					glog.V(2).Infof("is zip => extract")
 					f, err := b.fileToReader(file.Source)
 					if err != nil {
 						return err
@@ -286,7 +284,7 @@ func (b *builder) copyFilesToWorkingDirectoryCommand() command.Command {
 					return b.extractZipFile(f, filename)
 				}
 				if strings.HasSuffix(file.Source, ".tar.gz") || strings.HasSuffix(file.Source, ".tgz") {
-					logger.Debugf("is tar gz => extract")
+					glog.V(2).Infof("is tar gz => extract")
 					f, err := b.fileToReader(file.Source)
 					if err != nil {
 						return err
@@ -297,7 +295,7 @@ func (b *builder) copyFilesToWorkingDirectoryCommand() command.Command {
 				return fmt.Errorf("unkown file type")
 			}
 			if isURL(file.Source) {
-				logger.Debugf("%s is url", file.Source)
+				glog.V(2).Infof("%s is url", file.Source)
 				f, err := b.fileToReader(file.Source)
 				if err != nil {
 					return err
@@ -317,7 +315,7 @@ func (b *builder) copyFilesToWorkingDirectoryCommand() command.Command {
 				return err
 			}
 		}
-		logger.Debugf("all files copied")
+		glog.V(2).Infof("all files copied")
 		return nil
 	}, func() error {
 		return nil
@@ -348,11 +346,11 @@ func (b *builder) fileToReader(path string) (io.ReadCloser, error) {
 
 func (b *builder) cleanWorkingDirectoryCommand() command.Command {
 	return command_adapter.New(func() error {
-		logger.Debugf("clean working directory")
+		glog.V(2).Infof("clean working directory")
 		if err := os.RemoveAll(b.workingdirectory); err != nil {
 			return err
 		}
-		logger.Debugf("working directory cleaned")
+		glog.V(2).Infof("working directory cleaned")
 		return nil
 	}, func() error {
 		return nil
@@ -360,7 +358,7 @@ func (b *builder) cleanWorkingDirectoryCommand() command.Command {
 }
 
 func createDirectory(directory string) error {
-	logger.Debugf("create directory %s", directory)
+	glog.V(2).Infof("create directory %s", directory)
 	return os.MkdirAll(directory, 0755)
 }
 

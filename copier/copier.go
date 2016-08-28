@@ -5,7 +5,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/bborbe/log"
+	"github.com/golang/glog"
 )
 
 type Copier interface {
@@ -15,14 +15,12 @@ type Copier interface {
 type copier struct {
 }
 
-var logger = log.DefaultLogger
-
 func New() *copier {
 	return new(copier)
 }
 
 func (c *copier) Copy(source string, target string) error {
-	logger.Debugf("Copy %s => %s", source, target)
+	glog.V(2).Infof("Copy %s => %s", source, target)
 	finfo, err := os.Stat(source)
 	if err != nil {
 		return err
@@ -34,29 +32,29 @@ func (c *copier) Copy(source string, target string) error {
 }
 
 func (c *copier) CopyDir(source string, target string) error {
-	logger.Debugf("CopyDir %s => %s", source, target)
+	glog.V(2).Infof("CopyDir %s => %s", source, target)
 	finfo, err := os.Stat(source)
 	if err != nil {
-		logger.Debugf("get stat failed")
+		glog.V(2).Infof("get stat failed")
 		return err
 	}
 	if err = os.MkdirAll(target, finfo.Mode()); err != nil {
-		logger.Debugf("mkdir target dir failed")
+		glog.V(2).Infof("mkdir target dir failed")
 		return err
 	}
 	dir, err := os.Open(source)
 	defer dir.Close()
 	if err != nil {
-		logger.Debugf("open source failed")
+		glog.V(2).Infof("open source failed")
 		return err
 	}
 	files, err := dir.Readdir(-1)
 	if err != nil {
-		logger.Debugf("read source dir failed")
+		glog.V(2).Infof("read source dir failed")
 		return err
 	}
 	for _, file := range files {
-		logger.Debugf("file: %s", file.Name())
+		glog.V(2).Infof("file: %s", file.Name())
 		if err = c.Copy(fmt.Sprintf("%s/%s", source, file.Name()), fmt.Sprintf("%s/%s", target, file.Name())); err != nil {
 			return err
 		}
@@ -65,7 +63,7 @@ func (c *copier) CopyDir(source string, target string) error {
 }
 
 func (c *copier) CopyFile(source string, target string) error {
-	logger.Debugf("CopyFile %s => %s", source, target)
+	glog.V(2).Infof("CopyFile %s => %s", source, target)
 	finfo, err := os.Stat(source)
 	if err != nil {
 		return err

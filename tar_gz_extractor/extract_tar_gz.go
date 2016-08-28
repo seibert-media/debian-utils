@@ -8,7 +8,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/bborbe/log"
+	"github.com/golang/glog"
 )
 
 type TarGzExtractor interface {
@@ -22,10 +22,8 @@ func New() *tarGzExtractor {
 	return new(tarGzExtractor)
 }
 
-var logger = log.DefaultLogger
-
 func (e *tarGzExtractor) ExtractTarGz(fileReader io.Reader, targetDir string) error {
-	logger.Debugf("extract tar fz to %s", targetDir)
+	glog.V(2).Infof("extract tar fz to %s", targetDir)
 
 	gw, err := gzip.NewReader(fileReader)
 	if err != nil {
@@ -53,16 +51,16 @@ func (e *tarGzExtractor) ExtractTarGz(fileReader io.Reader, targetDir string) er
 				return err
 			}
 		default:
-			logger.Debugf("Can't: %c, %s\n", hdr.Typeflag, path)
+			glog.V(2).Infof("Can't: %c, %s\n", hdr.Typeflag, path)
 		}
 	}
 
-	logger.Debugf("tar fz extracted")
+	glog.V(2).Infof("tar fz extracted")
 	return nil
 }
 
 func extractFile(path string, mode os.FileMode, tr io.Reader) error {
-	logger.Debugf("extract file: %s %v", path, mode)
+	glog.V(2).Infof("extract file: %s %v", path, mode)
 	dir := filepath.Dir(path)
 	_, err := os.Stat(dir)
 	if err != nil {
@@ -74,7 +72,7 @@ func extractFile(path string, mode os.FileMode, tr io.Reader) error {
 	ow, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, mode)
 	defer ow.Close()
 	if err != nil {
-		logger.Debugf("open file failed: %s %v", path, mode)
+		glog.V(2).Infof("open file failed: %s %v", path, mode)
 		return err
 	}
 	if err != nil {
@@ -87,6 +85,6 @@ func extractFile(path string, mode os.FileMode, tr io.Reader) error {
 }
 
 func mkdir(path string, mode os.FileMode) error {
-	logger.Debugf("mkdir: %s %v", path, mode)
+	glog.V(2).Infof("mkdir: %s %v", path, mode)
 	return os.MkdirAll(path, mode)
 }

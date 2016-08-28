@@ -11,24 +11,21 @@ import (
 
 	http_client_builder "github.com/bborbe/http/client_builder"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
-	"github.com/bborbe/log"
+	"github.com/golang/glog"
 )
 
-var logger = log.DefaultLogger
-
 const (
-	parameterLoglevel = "loglevel"
-	parameterPath     = "path"
+	parameterPath = "path"
+)
+
+var (
+	pathPtr = flag.String(parameterPath, "", "path")
 )
 
 func main() {
-	defer logger.Close()
-	logLevelPtr := flag.String(parameterLoglevel, log.INFO_STRING, log.FLAG_USAGE)
-	pathPtr := flag.String(parameterPath, "", "path")
+	defer glog.Flush()
+	glog.CopyStandardLogTo("info")
 	flag.Parse()
-	logger.SetLevelThreshold(log.LogStringToLevel(*logLevelPtr))
-	logger.Debugf("set log level to %s", *logLevelPtr)
-
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	httpClientBuilder := http_client_builder.New().WithoutProxy()
@@ -40,21 +37,19 @@ func main() {
 
 	bool, err := do(hasChanged, *pathPtr)
 	if err != nil {
-		logger.Fatal(err)
-		logger.Close()
-		os.Exit(1)
+		glog.Exit(err)
 	}
 	if bool {
-		logger.Close()
+		glog.Flush()
 		os.Exit(0)
 	} else {
-		logger.Close()
+		glog.Flush()
 		os.Exit(1)
 	}
 }
 
 func do(hasChanged debian_apt_source_has_changed.AptSourceHasChanged, path string) (bool, error) {
-	logger.Debugf("update repos in apt source list: %s", path)
+	glog.V(2).Infof("update repos in apt source list: %s", path)
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		return false, err
 	}

@@ -5,10 +5,8 @@ import (
 	"io"
 	"os"
 
-	"github.com/bborbe/log"
+	"github.com/golang/glog"
 )
-
-var logger = log.DefaultLogger
 
 type AptSourceHasChanged interface {
 	HasFileChanged(path string) (bool, error)
@@ -29,7 +27,7 @@ func New(hasLineChanged HasLineChanged) *aptSourceHasChanged {
 }
 
 func (a *aptSourceHasChanged) HasFileChanged(path string) (bool, error) {
-	logger.Debugf("hasFileChanged - path: %s", path)
+	glog.V(2).Infof("hasFileChanged - path: %s", path)
 	file, err := os.Open(path)
 	if err != nil {
 		return false, err
@@ -49,7 +47,7 @@ func hasFileChanged(readString ReadString, hasLineChanged HasLineChanged) (bool,
 					return false, err
 				}
 				if changed {
-					logger.Debugf("line has changed => true")
+					glog.V(2).Infof("line has changed => true")
 					return true, nil
 				}
 			}
@@ -59,7 +57,7 @@ func hasFileChanged(readString ReadString, hasLineChanged HasLineChanged) (bool,
 			return false, err
 		}
 		if changed {
-			logger.Debugf("line has changed => true")
+			glog.V(2).Infof("line has changed => true")
 			return true, nil
 		}
 	}

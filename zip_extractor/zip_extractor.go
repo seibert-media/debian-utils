@@ -7,7 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/bborbe/log"
+	"github.com/golang/glog"
 )
 
 type ZipExtractor interface {
@@ -21,15 +21,13 @@ func New() *zipExtractor {
 	return new(zipExtractor)
 }
 
-var logger = log.DefaultLogger
-
 func (e *zipExtractor) ExtractZip(fileReader io.Reader, targetDir string) error {
-	logger.Debugf("extract zip")
+	glog.V(2).Infof("extract zip")
 
 	filename := "/tmp/test.zip"
 	defer func() {
 		if err := os.Remove(filename); err != nil {
-			logger.Warnf("remove file %v failed: %v", filename, err)
+			glog.Warningf("remove file %v failed: %v", filename, err)
 		}
 	}()
 	err := write(fileReader, filename)
@@ -40,7 +38,7 @@ func (e *zipExtractor) ExtractZip(fileReader io.Reader, targetDir string) error 
 }
 
 func (e *zipExtractor) ExtractZipFile(filename string, targetDir string) error {
-	logger.Debugf("extract zip %s", filename)
+	glog.V(2).Infof("extract zip %s", filename)
 	z, err := zip.OpenReader(filename)
 	if err != nil {
 		return err
@@ -48,12 +46,12 @@ func (e *zipExtractor) ExtractZipFile(filename string, targetDir string) error {
 	for _, f := range z.File {
 		path := fmt.Sprintf("%s/%s", targetDir, f.Name)
 		if f.FileInfo().IsDir() {
-			logger.Debugf("extract dir %s", f.Name)
+			glog.V(2).Infof("extract dir %s", f.Name)
 			if err := mkdir(path, f.FileInfo().Mode()); err != nil {
 				return err
 			}
 		} else {
-			logger.Debugf("extract file %s", f.Name)
+			glog.V(2).Infof("extract file %s", f.Name)
 			reader, err := f.Open()
 			if err != nil {
 				return err
@@ -65,12 +63,12 @@ func (e *zipExtractor) ExtractZipFile(filename string, targetDir string) error {
 			reader.Close()
 		}
 	}
-	logger.Debugf("zip extracted %s", filename)
+	glog.V(2).Infof("zip extracted %s", filename)
 	return nil
 }
 
 func extractFile(path string, mode os.FileMode, tr io.Reader) error {
-	logger.Debugf("extract file: %s %v", path, mode)
+	glog.V(2).Infof("extract file: %s %v", path, mode)
 	dir := filepath.Dir(path)
 	_, err := os.Stat(dir)
 	if err != nil {
@@ -82,7 +80,7 @@ func extractFile(path string, mode os.FileMode, tr io.Reader) error {
 	ow, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, mode)
 	defer ow.Close()
 	if err != nil {
-		logger.Debugf("open file failed: %s %v", path, mode)
+		glog.V(2).Infof("open file failed: %s %v", path, mode)
 		return err
 	}
 	if err != nil {
@@ -95,7 +93,7 @@ func extractFile(path string, mode os.FileMode, tr io.Reader) error {
 }
 
 func mkdir(path string, mode os.FileMode) error {
-	logger.Debugf("mkdir: %s %v", path, mode)
+	glog.V(2).Infof("mkdir: %s %v", path, mode)
 	return os.MkdirAll(path, mode)
 }
 

@@ -8,7 +8,7 @@ import (
 
 	"path/filepath"
 
-	"github.com/bborbe/log"
+	"github.com/golang/glog"
 )
 
 type AptSourceListUpdater interface {
@@ -19,8 +19,6 @@ type aptSourceListUpdater struct {
 	hasFileChanged HasFileChanged
 }
 
-var logger = log.DefaultLogger
-
 type HasFileChanged func(path string) (bool, error)
 
 func New(hasFileChanged HasFileChanged) *aptSourceListUpdater {
@@ -30,16 +28,16 @@ func New(hasFileChanged HasFileChanged) *aptSourceListUpdater {
 }
 
 func (a *aptSourceListUpdater) UpdateAptSourceList(path string) error {
-	logger.Debugf("UpdateAptSourceList - path: %s", path)
+	glog.V(2).Infof("UpdateAptSourceList - path: %s", path)
 	changed, err := a.hasFileChanged(path)
 	if err != nil {
 		return err
 	}
 	if changed {
-		logger.Debugf("has changed => trigger update")
+		glog.V(2).Infof("has changed => trigger update")
 		return a.update(path)
 	}
-	logger.Debugf("nothing has changed")
+	glog.V(2).Infof("nothing has changed")
 	return nil
 }
 

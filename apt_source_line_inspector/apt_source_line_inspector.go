@@ -8,10 +8,8 @@ import (
 
 	"io/ioutil"
 
-	"github.com/bborbe/log"
+	"github.com/golang/glog"
 )
-
-var logger = log.DefaultLogger
 
 type LineInspector interface {
 	HasLineChanged(line string) (bool, error)
@@ -30,7 +28,7 @@ func New(downloadURL DownloadURL) *lineInspector {
 }
 
 func (a *lineInspector) HasLineChanged(line string) (bool, error) {
-	logger.Debugf("updateLine - line: %s", line)
+	glog.V(2).Infof("updateLine - line: %s", line)
 	if strings.Index(line, "deb ") != 0 {
 		return false, nil
 	}
@@ -49,7 +47,7 @@ type infos struct {
 }
 
 func parseLine(line string) (*infos, error) {
-	logger.Debugf("parse line %s", line)
+	glog.V(2).Infof("parse line %s", line)
 	i := new(infos)
 	{
 		re := regexp.MustCompile(`deb\s+\[arch=(.*?)\]\s+([^\s]+)\s+([^\s]+)\s+([^\s]+)`)
@@ -88,23 +86,23 @@ func parseLine(line string) (*infos, error) {
 
 func (a *lineInspector) compareLocalAndRemotePackage(infos *infos) (bool, error) {
 	remotePackagesURL := infos.RemotePackagesURL()
-	logger.Debugf("remote packages url: %s", remotePackagesURL)
+	glog.V(2).Infof("remote packages url: %s", remotePackagesURL)
 	remotePackagesContent, err := a.downloadURL(remotePackagesURL)
 	if err != nil {
-		logger.Debugf("fetch remote package failed => return false")
+		glog.V(2).Infof("fetch remote package failed => return false")
 		return false, err
 	}
 	localPackagesFile := infos.LocalPackagesFile()
-	logger.Debugf("local packages file: %s", localPackagesFile)
+	glog.V(2).Infof("local packages file: %s", localPackagesFile)
 	localPackagesContent, err := a.readFile(localPackagesFile)
 	if err != nil {
-		logger.Debugf("read local package failed => return true")
+		glog.V(2).Infof("read local package failed => return true")
 		// return false, err
 		// return true if file not found
 		return true, nil
 	}
 	result := localPackagesContent != remotePackagesContent
-	logger.Debugf("compare local and remote %v", result)
+	glog.V(2).Infof("compare local and remote %v", result)
 	return result, nil
 }
 

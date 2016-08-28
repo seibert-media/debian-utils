@@ -2,43 +2,37 @@ package main
 
 import (
 	"flag"
-	"os"
 	"runtime"
 
 	"fmt"
 
 	"github.com/bborbe/debian_utils/zip_extractor"
-	"github.com/bborbe/log"
+	"github.com/golang/glog"
 )
 
-var logger = log.DefaultLogger
-
 const (
-	parameterLoglevel = "loglevel"
-	parameterZip      = "zip"
-	parameterTarget   = "target"
+	parameterZip    = "zip"
+	parameterTarget = "target"
 )
 
 type ExtractZipFile func(filename string, targetDir string) error
 
-func main() {
-	defer logger.Close()
-	logLevelPtr := flag.String(parameterLoglevel, log.INFO_STRING, log.FLAG_USAGE)
-	zipPtr := flag.String(parameterZip, "", "zip")
-	targetPtr := flag.String(parameterTarget, "", "target")
-	flag.Parse()
-	logger.SetLevelThreshold(log.LogStringToLevel(*logLevelPtr))
-	logger.Debugf("set log level to %s", *logLevelPtr)
+var (
+	zipPtr    = flag.String(parameterZip, "", "zip")
+	targetPtr = flag.String(parameterTarget, "", "target")
+)
 
+func main() {
+	defer glog.Flush()
+	glog.CopyStandardLogTo("info")
+	flag.Parse()
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	z := zip_extractor.New()
 
 	err := do(z.ExtractZipFile, *zipPtr, *targetPtr)
 	if err != nil {
-		logger.Fatal(err)
-		logger.Close()
-		os.Exit(1)
+		glog.Exit(err)
 	}
 }
 

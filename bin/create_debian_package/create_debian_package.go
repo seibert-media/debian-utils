@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"os"
 	"runtime"
 
 	debian_command_list "github.com/bborbe/command/list"
@@ -15,34 +14,31 @@ import (
 	debian_zip_extractor "github.com/bborbe/debian_utils/zip_extractor"
 	http_client_builder "github.com/bborbe/http/client_builder"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
-	"github.com/bborbe/log"
+	"github.com/golang/glog"
 )
 
-var logger = log.DefaultLogger
-
 const (
-	paramterName     = "name"
-	paramterVersion  = "version"
-	paramterSource   = "source"
-	paramterTarget   = "target"
-	paramterLoglevel = "loglevel"
-	paramterConfig   = "config"
+	paramterName    = "name"
+	paramterVersion = "version"
+	paramterSource  = "source"
+	paramterTarget  = "target"
+	paramterConfig  = "config"
 )
 
 type ConfigBuilderWithConfig func(config *debian_config.Config) debian_config_builder.ConfigBuilder
 
-func main() {
-	defer logger.Close()
-	logLevelPtr := flag.String(paramterLoglevel, log.INFO_STRING, log.FLAG_USAGE)
-	configPtr := flag.String(paramterConfig, "", "config")
-	namePtr := flag.String(paramterName, "", "name")
-	versionPtr := flag.String(paramterVersion, "", "version")
-	sourcePtr := flag.String(paramterSource, "", "source")
-	targetPtr := flag.String(paramterTarget, "", "target")
-	flag.Parse()
-	logger.SetLevelThreshold(log.LogStringToLevel(*logLevelPtr))
-	logger.Debugf("set log level to %s", *logLevelPtr)
+var (
+	configPtr  = flag.String(paramterConfig, "", "config")
+	namePtr    = flag.String(paramterName, "", "name")
+	versionPtr = flag.String(paramterVersion, "", "version")
+	sourcePtr  = flag.String(paramterSource, "", "source")
+	targetPtr  = flag.String(paramterTarget, "", "target")
+)
 
+func main() {
+	defer glog.Flush()
+	glog.CopyStandardLogTo("info")
+	flag.Parse()
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	commandListProvider := func() debian_command_list.CommandList {
@@ -62,9 +58,7 @@ func main() {
 
 	err := do(config_parser, configBuilderWithConfig, debianPackageCreator, *configPtr, *namePtr, *versionPtr, *sourcePtr, *targetPtr)
 	if err != nil {
-		logger.Fatal(err)
-		logger.Close()
-		os.Exit(1)
+		glog.Exit(err)
 	}
 }
 
