@@ -10,7 +10,8 @@ create_debian_package create a Debian-Package with instructions out of a Json co
 
 ```
 create_debian_package \
--loglevel=DEBUG \
+-logtostderr \
+-v=2 \
 -version=1.2.3 \
 -config=create_debian_package_config.json
 ```
@@ -52,13 +53,15 @@ update_available_apt_source_list checks if a debian repo has changed and update_
 
 ```
 update_available_apt_source_list \
--loglevel=DEBUG \
+-logtostderr \
+-v=2 \
 -path /etc/apt/sources.list.d/aptly-unstable.benjamin-borbe.de.list
 ```
 
 ```
 update_apt_source_list \
--loglevel=DEBUG \
+-logtostderr \
+-v=2 \
 -path /etc/apt/sources.list.d/aptly-unstable.benjamin-borbe.de.list
 ```
 
