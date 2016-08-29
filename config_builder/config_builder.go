@@ -107,10 +107,10 @@ func (c *configBuilder) AddDepend(depend string) error {
 
 func (c *configBuilder) AddFile(source string, target string) error {
 	if len(source) == 0 {
-		return fmt.Errorf("source empty")
+		return fmt.Errorf("add file failed. source is empty")
 	}
 	if len(target) == 0 {
-		return fmt.Errorf("target empty")
+		return fmt.Errorf("add file failed. target is empty")
 	}
 	c.config.Files = append(c.config.Files, debian_config.File{Source: source, Target: target})
 	return nil
