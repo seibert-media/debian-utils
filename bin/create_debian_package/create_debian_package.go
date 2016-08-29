@@ -81,14 +81,20 @@ func do(
 		}
 	}
 	config_builder := configBuilderWithConfig(config)
-	if err := config_builder.AddFile(source, target); err != nil {
-		return err
+	if len(source) > 0 && len(target) > 0 {
+		if err := config_builder.AddFile(source, target); err != nil {
+			return err
+		}
 	}
-	if err := config_builder.Name(name); err != nil {
-		return err
+	if len(name) > 0 {
+		if err := config_builder.Name(name); err != nil {
+			return err
+		}
 	}
-	if err := config_builder.Version(version); err != nil {
-		return err
+	if len(version) > 0 {
+		if err := config_builder.Version(version); err != nil {
+			return err
+		}
 	}
 	return package_creator.CreatePackage(config_builder.Build())
 }
