@@ -35,7 +35,10 @@ func main() {
 	lineInspector := debian_line_inspector.New(downloader.DownloadURL)
 	hasChanged := debian_apt_source_has_changed.New(lineInspector.HasLineChanged)
 
-	bool, err := do(hasChanged, *pathPtr)
+	bool, err := do(
+		hasChanged,
+		*pathPtr,
+	)
 	if err != nil {
 		glog.Exit(err)
 	}
@@ -48,8 +51,11 @@ func main() {
 	}
 }
 
-func do(hasChanged debian_apt_source_has_changed.AptSourceHasChanged, path string) (bool, error) {
-	glog.V(2).Infof("update repos in apt source list: %s", path)
+func do(
+	hasChanged debian_apt_source_has_changed.AptSourceHasChanged,
+	path string,
+) (bool, error) {
+	glog.Infof("update repos in apt source list: %s", path)
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		return false, err
 	}

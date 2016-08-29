@@ -70,7 +70,9 @@ func do(
 	name string,
 	version string,
 	source string,
-	target string) error {
+	target string,
+) error {
+	glog.Infof("config: %v name: %v version: %v source: %v target: %v", configpath, name, version, source, target)
 	var err error
 	config := debian_config.DefaultConfig()
 	if len(configpath) > 0 {

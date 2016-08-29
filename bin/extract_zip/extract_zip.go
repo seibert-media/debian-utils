@@ -30,13 +30,18 @@ func main() {
 
 	z := zip_extractor.New()
 
-	err := do(z.ExtractZipFile, *zipPtr, *targetPtr)
+	err := do(
+		z.ExtractZipFile,
+		*zipPtr,
+		*targetPtr,
+	)
 	if err != nil {
 		glog.Exit(err)
 	}
 }
 
 func do(extractZipFile ExtractZipFile, zip string, target string) error {
+	glog.Infof("zip: %v target: %v", zip, target)
 	if len(zip) == 0 {
 		return fmt.Errorf("parameter %s missing", parameterZip)
 	}

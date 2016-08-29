@@ -37,14 +37,20 @@ func main() {
 	hasChanged := debian_apt_source_has_changed.New(lineInspector.HasLineChanged)
 	updater := debian_apt_source_list_updater.New(hasChanged.HasFileChanged)
 
-	err := do(updater, *pathPtr)
+	err := do(
+		updater,
+		*pathPtr,
+	)
 	if err != nil {
 		glog.Exit(err)
 	}
 }
 
-func do(updater debian_apt_source_list_updater.AptSourceListUpdater, path string) error {
-	glog.V(2).Infof("update repos in apt source list: %s", path)
+func do(
+	updater debian_apt_source_list_updater.AptSourceListUpdater,
+	path string,
+) error {
+	glog.Infof("update repos in apt source list: %s", path)
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		return err
 	}
