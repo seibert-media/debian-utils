@@ -190,6 +190,15 @@ func controlContent(config debian_config.Config) []byte {
 	if len(config.Depends) > 0 {
 		fmt.Fprintf(buffer, "Depends: %s\n", strings.Join(config.Depends, ","))
 	}
+	if len(config.Conflicts) > 0 {
+		fmt.Fprintf(buffer, "Conflicts: %s\n", strings.Join(config.Conflicts, ","))
+	}
+	if len(config.Provides) > 0 {
+		fmt.Fprintf(buffer, "Provides: %s\n", strings.Join(config.Provides, ","))
+	}
+	if len(config.Replaces) > 0 {
+		fmt.Fprintf(buffer, "Replaces: %s\n", strings.Join(config.Replaces, ","))
+	}
 	return buffer.Bytes()
 }
 

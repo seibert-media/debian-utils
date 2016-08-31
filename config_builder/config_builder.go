@@ -16,7 +16,10 @@ type ConfigBuilder interface {
 	Maintainer(maintainer string) error
 	Description(description string) error
 	AddFile(source string, target string) error
-	AddDepend(depend string) error
+	AddDepend(value string) error
+	AddConflict(value string) error
+	AddProvide(value string) error
+	AddReplace(value string) error
 	Build() *debian_config.Config
 }
 
@@ -97,11 +100,35 @@ func (c *configBuilder) Version(version string) error {
 	return nil
 }
 
-func (c *configBuilder) AddDepend(depend string) error {
-	if len(depend) == 0 {
+func (c *configBuilder) AddDepend(value string) error {
+	if len(value) == 0 {
 		return fmt.Errorf("depend empty")
 	}
-	c.config.Depends = append(c.config.Depends, depend)
+	c.config.Depends = append(c.config.Depends, value)
+	return nil
+}
+
+func (c *configBuilder) AddConflict(value string) error {
+	if len(value) == 0 {
+		return fmt.Errorf("depend empty")
+	}
+	c.config.Conflicts = append(c.config.Conflicts, value)
+	return nil
+}
+
+func (c *configBuilder) AddProvide(value string) error {
+	if len(value) == 0 {
+		return fmt.Errorf("depend empty")
+	}
+	c.config.Provides = append(c.config.Provides, value)
+	return nil
+}
+
+func (c *configBuilder) AddReplace(value string) error {
+	if len(value) == 0 {
+		return fmt.Errorf("depend empty")
+	}
+	c.config.Replaces = append(c.config.Replaces, value)
 	return nil
 }
 

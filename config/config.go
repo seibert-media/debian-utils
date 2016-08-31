@@ -17,6 +17,9 @@ type Config struct {
 	Description  string   `json:"description"`
 	Homepage     string   `json:"homepage"`
 	Depends      []string `json:"depends"`
+	Conflicts    []string `json:"conflicts"`
+	Provides     []string `json:"provides"`
+	Replaces     []string `json:"replaces"`
 	Postrm       string   `json:"postrm"`
 	Postinst     string   `json:"postinst"`
 	Prerm        string   `json:"prerm"`
@@ -32,5 +35,8 @@ func DefaultConfig() *Config {
 	c.Description = "-"
 	c.Files = []File{}
 	c.Depends = []string{}
+	c.Conflicts = []string{}
+	c.Provides = []string{}
+	c.Replaces = []string{}
 	return c
 }
