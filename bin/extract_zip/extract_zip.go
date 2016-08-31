@@ -40,7 +40,11 @@ func main() {
 	}
 }
 
-func do(extractZipFile ExtractZipFile, zip string, target string) error {
+func do(
+	extractZipFile ExtractZipFile,
+	zip string,
+	target string,
+) error {
 	glog.Infof("zip: %v target: %v", zip, target)
 	if len(zip) == 0 {
 		return fmt.Errorf("parameter %s missing", parameterZip)
