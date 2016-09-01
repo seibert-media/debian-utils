@@ -7,6 +7,7 @@ import (
 
 	debian_config "github.com/bborbe/debian_utils/config"
 	io_util "github.com/bborbe/io/util"
+	"github.com/golang/glog"
 )
 
 type ConfigParser interface {
@@ -23,8 +24,10 @@ func New() *configParser {
 
 func (c *configParser) ParseContentToConfig(config *debian_config.Config, content []byte) (*debian_config.Config, error) {
 	if err := json.Unmarshal(content, config); err != nil {
+		glog.Warningf("parse json failed: %v", err)
 		return nil, err
 	}
+	glog.V(2).Infof("parse config completed")
 	return config, nil
 }
 
@@ -35,6 +38,7 @@ func (c *configParser) ParseFileToConfig(config *debian_config.Config, path stri
 		return nil, err
 	}
 	if content, err = ioutil.ReadFile(path); err != nil {
+		glog.Warningf("read file %v failed: %v", path, err)
 		return nil, err
 	}
 	return c.ParseContentToConfig(config, content)
