@@ -1,9 +1,10 @@
 package package_creator
 
 import (
+	"testing"
+
 	. "github.com/bborbe/assert"
 	debian_config "github.com/bborbe/debian_utils/config"
-	"testing"
 )
 
 func TestImplementsPackageCreator(t *testing.T) {
