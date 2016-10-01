@@ -1,8 +1,8 @@
 install:
-	GOBIN=$(GOPATH)/bin GO15VENDOREXPERIMENT=1 go install bin/create_debian_package/create_debian_package.go
-	GOBIN=$(GOPATH)/bin GO15VENDOREXPERIMENT=1 go install bin/extract_zip/extract_zip.go
-	GOBIN=$(GOPATH)/bin GO15VENDOREXPERIMENT=1 go install bin/update_apt_source_list/update_apt_source_list.go
-	GOBIN=$(GOPATH)/bin GO15VENDOREXPERIMENT=1 go install bin/update_available_apt_source_list/update_available_apt_source_list.go
+	GOBIN=$(GOPATH)/bin GO15VENDOREXPERIMENT=1 go install bin/create_debian_package/*.go
+	GOBIN=$(GOPATH)/bin GO15VENDOREXPERIMENT=1 go install bin/extract_zip/*.go
+	GOBIN=$(GOPATH)/bin GO15VENDOREXPERIMENT=1 go install bin/update_apt_source_list/*.go
+	GOBIN=$(GOPATH)/bin GO15VENDOREXPERIMENT=1 go install bin/update_available_apt_source_list/*.go
 test:
 	GO15VENDOREXPERIMENT=1 go test -cover `glide novendor`
 vet:
