@@ -71,7 +71,7 @@ update_apt_source_list \
 
 ## Continuous integration
 
-[Jenkins](https://www.benjamin-borbe.de/jenkins/job/Go-Debian-Utils/)
+[Jenkins](https://jenkins.benjamin-borbe.de/job/Go-Debian-Utils/)
 
 ## Copyright and license
 
