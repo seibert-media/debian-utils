@@ -18,21 +18,21 @@ import (
 )
 
 const (
-	paramterName    = "name"
-	paramterVersion = "version"
-	paramterSource  = "source"
-	paramterTarget  = "target"
-	paramterConfig  = "config"
+	parameterName    = "name"
+	parameterVersion = "version"
+	parameterSource  = "source"
+	parameterTarget  = "target"
+	parameterConfig  = "config"
 )
 
 type ConfigBuilderWithConfig func(config *debian_config.Config) debian_config_builder.ConfigBuilder
 
 var (
-	configPtr  = flag.String(paramterConfig, "", "config")
-	namePtr    = flag.String(paramterName, "", "name")
-	versionPtr = flag.String(paramterVersion, "", "version")
-	sourcePtr  = flag.String(paramterSource, "", "source")
-	targetPtr  = flag.String(paramterTarget, "", "target")
+	configPtr  = flag.String(parameterConfig, "", "config")
+	namePtr    = flag.String(parameterName, "", "name")
+	versionPtr = flag.String(parameterVersion, "", "version")
+	sourcePtr  = flag.String(parameterSource, "", "source")
+	targetPtr  = flag.String(parameterTarget, "", "target")
 )
 
 func main() {
