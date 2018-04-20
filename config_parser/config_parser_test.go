@@ -3,7 +3,7 @@ package config_parser
 import (
 	"testing"
 
-	debian_config "github.com/bborbe/debian_utils/config"
+	debian_config "github.com/seibert-media/debian-utils/config"
 
 	. "github.com/bborbe/assert"
 )

@@ -5,11 +5,11 @@ import (
 
 	. "github.com/bborbe/assert"
 	debian_command_list "github.com/bborbe/command/list"
-	debian_config "github.com/bborbe/debian_utils/config"
-	debian_config_builder "github.com/bborbe/debian_utils/config_builder"
-	debian_config_parser "github.com/bborbe/debian_utils/config_parser"
-	debian_copier "github.com/bborbe/debian_utils/copier"
-	debian_package_creator "github.com/bborbe/debian_utils/package_creator"
+	debian_config "github.com/seibert-media/debian-utils/config"
+	debian_config_builder "github.com/seibert-media/debian-utils/config_builder"
+	debian_config_parser "github.com/seibert-media/debian-utils/config_parser"
+	debian_copier "github.com/seibert-media/debian-utils/copier"
+	debian_package_creator "github.com/seibert-media/debian-utils/package_creator"
 )
 
 func TestDo(t *testing.T) {

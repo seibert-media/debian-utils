@@ -3,7 +3,7 @@ package config_builder
 import (
 	"fmt"
 
-	debian_config "github.com/bborbe/debian_utils/config"
+	debian_config "github.com/seibert-media/debian-utils/config"
 	"github.com/golang/glog"
 )
 

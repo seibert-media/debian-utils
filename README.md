@@ -6,7 +6,7 @@ Package provide some debian utils
 
 create_debian_package create a Debian-Package with instructions out of a Json config.  
 
-`go get github.com/bborbe/debian_utils/bin/create_debian_package`
+`go get github.com/seibert-media/debian-utils/cmd/create_debian_package`
 
 ```
 create_debian_package \
@@ -26,10 +26,10 @@ create_debian_package \
   "architecture": "amd64",
   "maintainer": "Benjamin Borbe <bborbe@rocketnews.de>",
   "description": "Debian Package Utils",
-  "postinst": "src/github.com/bborbe/debian_utils/postinst",
-  "postrm": "src/github.com/bborbe/debian_utils/postrm",
-  "preinst": "src/github.com/bborbe/debian_utils/preinst",
-  "prerm": "src/github.com/bborbe/debian_utils/prerm",
+  "postinst": "src/github.com/seibert-media/debian-utils/postinst",
+  "postrm": "src/github.com/seibert-media/debian-utils/postrm",
+  "preinst": "src/github.com/seibert-media/debian-utils/preinst",
+  "prerm": "src/github.com/seibert-media/debian-utils/prerm",
   "files": [
     {
       "source": "bin/update_apt_source_list",
@@ -47,9 +47,9 @@ create_debian_package \
 
 update_available_apt_source_list checks if a debian repo has changed and update_apt_source_list fetches the new sources.
 
-`go get github.com/bborbe/debian_utils/bin/update_available_apt_source_list`
+`go get github.com/seibert-media/debian-utils/cmd/update_available_apt_source_list`
 
-`go get github.com/bborbe/debian_utils/bin/update_apt_source_list`
+`go get github.com/seibert-media/debian-utils/cmd/update_apt_source_list`
 
 ```
 update_available_apt_source_list \
@@ -67,7 +67,7 @@ update_apt_source_list \
 
 ## Extract Zip
 
-`go get github.com/bborbe/debian_utils/bin/extract_zip`
+`go get github.com/seibert-media/debian-utils/cmd/extract_zip`
 
 ## Continuous integration
 

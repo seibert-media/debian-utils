@@ -4,7 +4,7 @@ import (
 	"io"
 	"net/http"
 
-	debian_config "github.com/bborbe/debian_utils/config"
+	debian_config "github.com/seibert-media/debian-utils/config"
 )
 
 type LatestConfluenceTarGzURL func() (string, error)

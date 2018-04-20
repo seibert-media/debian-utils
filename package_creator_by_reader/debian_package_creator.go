@@ -9,9 +9,9 @@ import (
 	"github.com/bborbe/command"
 	command_adapter "github.com/bborbe/command/adapter"
 	command_list "github.com/bborbe/command/list"
-	debian_config "github.com/bborbe/debian_utils/config"
-	debian_config_builder "github.com/bborbe/debian_utils/config_builder"
-	debian_package_creator "github.com/bborbe/debian_utils/package_creator"
+	debian_config "github.com/seibert-media/debian-utils/config"
+	debian_config_builder "github.com/seibert-media/debian-utils/config_builder"
+	debian_package_creator "github.com/seibert-media/debian-utils/package_creator"
 	"github.com/golang/glog"
 )
 

@@ -5,7 +5,7 @@ import (
 
 	"io/ioutil"
 
-	debian_config "github.com/bborbe/debian_utils/config"
+	debian_config "github.com/seibert-media/debian-utils/config"
 	io_util "github.com/bborbe/io/util"
 	"github.com/golang/glog"
 )

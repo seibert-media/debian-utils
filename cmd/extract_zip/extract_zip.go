@@ -6,7 +6,7 @@ import (
 
 	"fmt"
 
-	"github.com/bborbe/debian_utils/zip_extractor"
+	"github.com/seibert-media/debian-utils/zip_extractor"
 	"github.com/golang/glog"
 )
 

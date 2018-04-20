@@ -15,8 +15,8 @@ import (
 	"github.com/bborbe/command"
 	command_adapter "github.com/bborbe/command/adapter"
 	command_list "github.com/bborbe/command/list"
-	debian_config "github.com/bborbe/debian_utils/config"
-	debian_copier "github.com/bborbe/debian_utils/copier"
+	debian_config "github.com/seibert-media/debian-utils/config"
+	debian_copier "github.com/seibert-media/debian-utils/copier"
 	http_requestbuilder "github.com/bborbe/http/requestbuilder"
 	"github.com/golang/glog"
 )

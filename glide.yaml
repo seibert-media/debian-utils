@@ -1,4 +1,4 @@
-package: github.com/bborbe/debian_utils
+package: github.com/seibert-media/debian-utils
 import:
 - package: github.com/bborbe/command
   subpackages:

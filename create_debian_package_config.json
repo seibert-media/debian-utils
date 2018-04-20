@@ -5,7 +5,7 @@
   "architecture": "amd64",
   "maintainer": "Benjamin Borbe <bborbe@rocketnews.de>",
   "description": "Debian Package Utils",
-  "postinst": "src/github.com/bborbe/debian_utils/postinst",
+  "postinst": "src/github.com/seibert-media/debian-utils/postinst",
   "files": [
     {
       "source": "bin/update_apt_source_list",
