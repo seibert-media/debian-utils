@@ -1,14 +1,8 @@
 install:
-	GOBIN=$(GOPATH)/bin GO15VENDOREXPERIMENT=1 go install bin/aptly_clean_repo/*.go
-	GOBIN=$(GOPATH)/bin GO15VENDOREXPERIMENT=1 go install bin/aptly_copy_package/*.go
-	GOBIN=$(GOPATH)/bin GO15VENDOREXPERIMENT=1 go install bin/aptly_create_repo/*.go
-	GOBIN=$(GOPATH)/bin GO15VENDOREXPERIMENT=1 go install bin/aptly_delete_package/*.go
-	GOBIN=$(GOPATH)/bin GO15VENDOREXPERIMENT=1 go install bin/aptly_delete_repo/*.go
-	GOBIN=$(GOPATH)/bin GO15VENDOREXPERIMENT=1 go install bin/aptly_package_lister/*.go
-	GOBIN=$(GOPATH)/bin GO15VENDOREXPERIMENT=1 go install bin/aptly_package_versions/*.go
-	GOBIN=$(GOPATH)/bin GO15VENDOREXPERIMENT=1 go install bin/aptly_package_latest_version/*.go
-	GOBIN=$(GOPATH)/bin GO15VENDOREXPERIMENT=1 go install bin/aptly_repo_lister/*.go
-	GOBIN=$(GOPATH)/bin GO15VENDOREXPERIMENT=1 go install bin/aptly_upload/*.go
+	GOBIN=$(GOPATH)/bin GO15VENDOREXPERIMENT=1 go install cmd/create_debian_package/*.go
+	GOBIN=$(GOPATH)/bin GO15VENDOREXPERIMENT=1 go install cmd/extract_zip/*.go
+	GOBIN=$(GOPATH)/bin GO15VENDOREXPERIMENT=1 go install cmd/update_apt_source_list/*.go
+	GOBIN=$(GOPATH)/bin GO15VENDOREXPERIMENT=1 go install cmd/update_available_apt_source_list/*.go
 test:
 	GO15VENDOREXPERIMENT=1 go test -cover `glide novendor`
 vet:
