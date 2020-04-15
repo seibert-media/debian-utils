@@ -6,7 +6,7 @@ podTemplate(
 	containers: [
 		containerTemplate(
 			name: 'build-golang',
-			image: 'docker.io/bborbe/build-golang:1.0.0',
+			image: 'eu.gcr.io/gce-smedia-k8s/infinite-legacy/build-golang:1.0.0',
 			ttyEnabled: true,
 			command: 'cat',
 			resourceRequestCpu: '500m',
